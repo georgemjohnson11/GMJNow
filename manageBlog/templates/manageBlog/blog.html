@@ -1,33 +1,47 @@
 {% extends "websiteBackbone/header.html" %}
+
 {% block content %}
-    {% for post in post_list %}
-        <div class="row">
-            <div class="col-xs-6 col-md-4"><h2>{{ post.date|date:"Y-m-d" }}</h2></div>
-            <div class="col-xs-12 col-sm-6 col-md-8"><h2><a href="/blog/{{ post.id }}"> {{ post.title }} </a></h2></div>
+    <div class="container jumbotron">
+        {% for post in posts %}
+            <div class="container">
+                <div class="card-deck mb-3 text-justify" >
+                    <div class="card mb-4 box-shadow">
+                        <div class="card-header" style="background-color:skyblue">
+                            <h2 class="my-0 font-weight-normal" style="color:#e6eb5b">{{ post.title }}</h2>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title pricing-card-title">{{ post.date|date:"Y-m-d" }} <small class="text-muted"></small></h3>
+                            <ul class="list-unstyled mt-3 mb-4">
+                                {{ post.bodytext|truncatechars:400|safe|linebreaks }}
+                            </ul>
+                            <a href="/posts/{{ post.id }}"> Read More...  </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="container">
+            {% if is_paginated %}
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <div  class="col col-sm-4 col-md-4 col-lg-4">
+                            <a class="btn btn-outline-primary" href="?page={{ page_obj.previous_page_number }}">Previous </a>
+                        </div>
+                    {% endif %}
+                    <div class="col col-sm-4 col-md-4 col-lg-4">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </div>
+                    {% if page_obj.has_next %}
+                        <div class="col col-sm-4 col-md-4 col-lg-4">
+                            <a class="btn btn-outline-primary" href="?page={{ page_obj.next_page_number }}" >Next </a>
+                        </div>
+                    {% endif %}
+                </ul>
+            {% else %}
+                <h3>Your Post Exists</h3>
+                <p>Posts not yet available</p>
+            {% endif %}
         </div>
-        <div class="row">
-        <div class="container-fluid"> <h5>{{ post.bodytext|safe|linebreaks }}</h5></div>
-        </div>
-    {% endfor %}
+    </div>
 {%  endblock %}
-{#{% include "websiteBackbone/includes/pagination.html" %}#}
-<div class="pagination">
-    <span class=step-links">
-        {%  if object_list.has_previous %}
-            <a href="?page/{{ object_list.previous_page_number }}">
-                <span>Previous</span>
-            </a>
-        {% endif %}
-        <span class="current">
-            Page {{ object_list.number }} of {{ object_list.paginator.num_pages }}.
-        </span>
-        {% if object_list.has_next %}
-            <a href="?page/{{ object_list.next_page_number }}">
-                <span>Next</span>
-            </a>
-        {% endif %}
-    </span>
-</div>
-
-
 

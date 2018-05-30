@@ -1,32 +1,42 @@
+from django.conf import settings
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
-from .contactform import ContactForm
 from django.core.mail import send_mail
+from django.contrib import messages
+from django.http import HttpResponse, BadHeaderError, HttpResponseRedirect
+from .contactform import ContactForm
 
-# Create your views here
+
 def index(request):
-    return render(request, 'websiteBackbone/home.html')
+    return render(request, './websiteBackbone/home.html')
 
+def privacypolicy(request):
+    return render(request, './websiteBackbone/privacypolicy.html')
+
+def termsconditions(request):
+    return render(request, './websiteBackbone/termsconditions.html')
 
 def submission(request):
-    return render(request, 'websiteBackbone/submission.html',
+    return render(request, './websiteBackbone/submission.html',
                   {'content': ['An email has been sent!',
-                               'If you would like to follow up please contact me, please email me']})
+                               'A representative will follow up within 3-5 business days.']})
 
 
 def contact(request):
-    if request.method == 'POST':
+    if request.method == 'GET':
+        form = ContactForm()
+    else:
         form = ContactForm(request.POST)
         if form.is_valid():
             contactSubject = form.cleaned_data['contactSubject']
             contactMessage = form.cleaned_data['contactMessage']
             contactEmail = form.cleaned_data['contactSenderEmail']
-            recipients = ['georgemjohnson11@gmail.com']
+            recipients = ['resources@gmjnow.com']
             cc_myself = form.cleaned_data['cc_myself']
             if cc_myself:
                 recipients.append(contactEmail)
-            #send_mail(contactSubject, contactMessage, contactEmail, recipients)
+            try:
+                send_mail(contactSubject, contactMessage, contactEmail, recipients, fail_silently=True)
+            except BadHeaderError:
+                return HttpResponse('Invalid header found.')
             return HttpResponseRedirect('/submission/')
-    else:
-        form = ContactForm()
-    return render(request, 'websiteBackbone/contact.html', {'form': form})
+    return render(request, "websiteBackbone/contact.html", {'form': form})

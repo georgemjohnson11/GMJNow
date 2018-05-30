@@ -1,18 +1,16 @@
 {% extends "websiteBackbone/header.html" %}
 {% block content %}
-    <div class="row">
-        <div class="col-xs-6 col-md-4">
-            <h3><small>on {{ post.date }}</small></h3>
-        </div>
-        <div class="col-xs6 col-md-4">
-            <h3>
-                <a href="/blog/{{ post.id }}">{{ post.title }}</a>
-            </h3>
-        </div>
-    </div>
-    <div class=row">
-        <div class="container-fluid">
-            <p>{{ post.bodytext|safe|linebreaks }}</p>
-        </div>
-    </div>
+    <main role="main" class="container">
+      <div class="row jumbotron">
+        <div class="col-md-8 blog-main">
+          <div class="blog-post">
+            <h2 class="blog-post-title">{{ post.title }}</h2>
+            <p class="blog-post-meta"> On {{ post.date }} by ><a href="mailto:resources@gmjnow.com">resources@gmjnow.com </a></p>
+            <hr>
+              <p>{{ post.bodytext|safe|linebreaks }}</p>
+          </div>
+        </div>d
+      </div>
+    </main>
+
 {%  endblock %}

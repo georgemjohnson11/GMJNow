@@ -1,69 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>GMJ Blog</title>
-    {%  load staticfiles %}
-    <link rel="stylesheet" href="{%  static 'websiteBackbone/css/bootstrap.min.css' %}" type="text/css"/>
-    <meta name="viewport" content = "width=device-width, initial-scale=1.0">
+<html>
+      <head>
+        <title>GMJNOW</title>
+          {% load staticfiles %}
+        <meta property="og:image" content= "{% static 'img/navbar_logo_150x85.jpg' %}">
+        <meta property="og:site_name" content="GMJNOW"/>
+          <meta charset="utf-8"/>
+        <meta property="og:description" content="GMJNOW is a computer technology company specializing in engineering quality top-to-bottom full stack software architecture (design, development, deployments, and maintenance); automating, manufacturing, and supporting cloud-based IT infrastructure; and artificial intelligence driven solutions."/>
+        <meta property="og:type" content="blog"/>
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico'  %}">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+      </head>
+      <body>
 
-	<style type="text/css">
-		html,
-		body {
-		  height:100%
-		}
-	</style>
-</head>
+    <header>
 
-<body class="body" style="background-color:#f6f6f6">
-	<div class="container-fluid" style="min-height:95%; ">
-		<div class="row">
-			  <div class="col-sm-2">
-				  <br>
-				  <center>
-					<img src="{% static 'websiteBackbone/img/profile.jpg' %}" class="responsive-img" style='max-height:100px;' alt="face">
-				  </center>
-			  </div>
-			  <div class="col-sm-10">
-				  <br>
-				  <center>
-				  <h3>GMJ</h3>
-				  </center>
-			  </div>
-		</div><hr>
+        <di></di>
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark border-radius=20%">
+        <a class="navbar-brand" href="../#"><img src= "{%  static 'img/navbar_logo_150x85.jpg' %}"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="./../#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="./../posts/">Blog</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="./../contact/">Contact</a>
+            </li>
+          </ul>
+          <form class="form-inline mt-2 mt-md-0">
+            <input class="form-control mr-sm-2" type="text" placeholder="GMJnow..." aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+          </form>
+        </div>
+      </nav>
+    </header>
 
-		<div class="row">
-		  <div class="col-sm-2">
-		  <br>
-
-		  <br>
-		   <!-- Great, til you resize. -->
-			<!--<div class="well bs-sidebar affix" id="sidebar" style="background-color:#fff">-->
-			<div class="well bs-sidebar" id="sidebar" style="background-color:#fff">
-			  <ul class="nav nav-pills nav-stacked">
-				<li><a href='./../oldBlog/'>Home</a></li>
-				<li><a href='./../oldBlog/blog/'>Blog</a></li>
-                  <li><a href="./../oldBlog/projects/">Projects</a></li>
-				<li><a href='./../oldBlog/contact/'>Contact</a></li>
-			  </ul>
-			</div> <!--well bs-sidebar affix-->
-		  </div> <!--col-sm-2-->
-		  <div class="col-sm-10">
-
-			<div class='container-fluid'>
+    <!-- Begin page content -->
+    <div>
 			<br><br>
 			   {% block content %}
 			   {% endblock %}
-			</div>
-		  </div>
+			   <hr>
 		</div>
-	</div>
-	<footer>
-		<div class="container-fluid" style='margin-left:15px'>
-			<p><a href="mailto:email@email.com" target="blank">Contact</a> | <a href="https://www.linkedin.com/in/username/" target="blank">LinkedIn</a>  | <a href="https://github.com/georgemjohnson11" target="blank">GitHub</a></p>
-		</div>
-	</footer>
 
-</body>
-
+	<footer class="footer bg-dark">
+      <div class="container text-muted row">
+          <div class="col col-sm-4 col-md-4 col-lg-4"><a href="./../termsconditions/"> Terms and Conditions </a></div>
+          <div class="col col-sm-4 col-md-4 col-lg-4"><a href="mailto:resources@gmjnow.com"> Contact Us </a></div>
+          <div class="col col-sm-4 col-md-4 col-lg-4"><a href="./../privacypolicy/"> Privacy Policy </a></div>
+      </div>
+      <div class="container text-muted row">
+        <span class="col col-sm-6 col-md-6 col-lg-6"> GMJNOW LLC © 2018</span>
+      </div>
+  </footer>
+    
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="{% static 'js/jquery-slim.min.js' %}"><\/script>')</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+  </body>
 </html>
