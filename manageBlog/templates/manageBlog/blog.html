@@ -1,0 +1,33 @@
+{% extends "websiteBackbone/header.html" %}
+{% block content %}
+    {% for post in post_list %}
+        <div class="row">
+            <div class="col-xs-6 col-md-4"><h2>{{ post.date|date:"Y-m-d" }}</h2></div>
+            <div class="col-xs-12 col-sm-6 col-md-8"><h2><a href="/blog/{{ post.id }}"> {{ post.title }} </a></h2></div>
+        </div>
+        <div class="row">
+        <div class="container-fluid"> <h5>{{ post.bodytext|safe|linebreaks }}</h5></div>
+        </div>
+    {% endfor %}
+{%  endblock %}
+{#{% include "websiteBackbone/includes/pagination.html" %}#}
+<div class="pagination">
+    <span class=step-links">
+        {%  if object_list.has_previous %}
+            <a href="?page/{{ object_list.previous_page_number }}">
+                <span>Previous</span>
+            </a>
+        {% endif %}
+        <span class="current">
+            Page {{ object_list.number }} of {{ object_list.paginator.num_pages }}.
+        </span>
+        {% if object_list.has_next %}
+            <a href="?page/{{ object_list.next_page_number }}">
+                <span>Next</span>
+            </a>
+        {% endif %}
+    </span>
+</div>
+
+
+

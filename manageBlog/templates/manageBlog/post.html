@@ -1,0 +1,18 @@
+{% extends "websiteBackbone/header.html" %}
+{% block content %}
+    <div class="row">
+        <div class="col-xs-6 col-md-4">
+            <h3><small>on {{ post.date }}</small></h3>
+        </div>
+        <div class="col-xs6 col-md-4">
+            <h3>
+                <a href="/blog/{{ post.id }}">{{ post.title }}</a>
+            </h3>
+        </div>
+    </div>
+    <div class=row">
+        <div class="container-fluid">
+            <p>{{ post.bodytext|safe|linebreaks }}</p>
+        </div>
+    </div>
+{%  endblock %}

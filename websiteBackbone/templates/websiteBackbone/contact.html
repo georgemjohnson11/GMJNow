@@ -1,0 +1,30 @@
+{% extends "websiteBackbone/header.html" %}
+
+{% block content %}
+    <form action="/contact/" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <kbd><label for="id_contactName">Name: </label></kbd>
+            <input id="id_contactName" type="text" class="form-control" name="contactName" value="{{ current_name }}">
+        </div>
+         <div class="form-group">
+             <kbd><label for="id_contactSenderEmail">Email: </label></kbd>
+             <input id="id_contactSenderEmail" type="text" class="form-control" name="contactSenderEmail" value="{{ current_email }}">
+         </div>
+         <div class="form-group">
+             <kbd> <label for="id_contactSubject">Subject: </label></kbd>
+             <input id="id_contactSubject" type="text" class="form-control" name="contactSubject" value="{{ current_subject }}">
+         </div>
+        <div class="form-group">
+            <kbd> <label for="id_contactMessage">Message: </label></kbd>
+            <input id="id_contactMessage" type="text" class="form-control" name="contactMessage" value="{{ current_message }}">
+        </div>
+         <div class="checkbox" class="form-group">
+             <label>
+                 <input id="cc_myself" type="checkbox"> Check to CC Yourself
+             </label>
+         </div>
+        <input type="submit" value="Submit" class="btn btn-default" Submit>
+    </form>
+
+{%  endblock %}
