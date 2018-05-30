@@ -9,4 +9,7 @@ Please start by installing pip https://pip.pypa.io/en/stable/installing/
 4. Run 'pip install -r requirements.txt' in the root directory of this project
 5. Run 'python manage.py migrate'
 6. Run 'python manage.py runserver 127.0.0.1:8000'
-7. Go in your browser to '127.0.0.1:8000/oldBlog'
+7. Go in your browser to '127.0.0.1:8000'
+
+
+The nginx.conf can be dropped in /etc/nginx/conf.d/ and should serve up traffic if you insert your domain approopriately and get SSL certs on the EC2 instance
