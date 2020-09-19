@@ -19,6 +19,7 @@ from . import views
 urlpatterns = [
     url(r'contact/$', views.contact, name='contact'),
     url(r'submission/$', views.submission, name='submission'),
+    url(r'about/$', views.about, name='about'),
     url(r'privacypolicy/$', views.privacypolicy, name='privacypolicy'),
     url(r'termsconditions/$', views.termsconditions, name='termsconditions'),
     url(r'^', views.index, name='index'),

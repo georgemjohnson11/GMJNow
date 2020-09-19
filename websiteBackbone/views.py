@@ -6,6 +6,9 @@ from django.http import HttpResponse, BadHeaderError, HttpResponseRedirect
 from .contactform import ContactForm
 
 
+def about(request):
+    return render(request, './websiteBackbone/about.html')
+
 def index(request):
     return render(request, './websiteBackbone/home.html')
 
