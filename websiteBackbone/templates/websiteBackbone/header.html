@@ -28,21 +28,12 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="./../#">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="./../posts/">Blog</a>
-                </li>
-            </ul>
-
-            <form class="row text-center" style="width: 75%;" method="POST" action=".">
+            <form class="row text-center" style="width: 75%;" method="post" action="./../finance/" >
                 {% csrf_token %}
                 <div class="col pr-1">
-                    <input class="form-control searchFieldText" type="text" maxlength="7"
-                           onkeyup="this.value = this.value.toUpperCase();" name="stockTicker"
-                           placeholder="Enter Stock Symbol (e.g. AAPL, AMD, AMZN)" aria-label="Search">
+                    <input class="form-control searchFieldText" type="text" maxlength="7" label="stock_ticker_symbol"
+                           onkeyup="this.value = this.value.toUpperCase();" name="stock_ticker_symbol" id="stock_ticker_symbol"
+                           placeholder="Enter Stock Symbol (e.g. AAPL, AMD, AMZN)" value="{{ stock_ticker_symbol }}" aria-label="Search">
                 </div>
                 <div class="col-auto px-0">
                     <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0" type="submit">Search</button>
@@ -65,16 +56,16 @@
         <div class="col col-sm-4 col-md-4 col-lg-4"><a href="./../posts/">Blog</a></div>
         <div class="col col-sm-4 col-md-4 col-lg-4"><a href="https://mailchi.mp/0aec99988c6b/gmjnow-finance">Subscribe</a></div>
         <div class="col col-sm-4 col-md-4 col-lg-4"><a href="./../termsconditions/">Terms and Conditions</a></div>
-        <div class="col col-sm-4 col-md-4 col-lg-4"><a href="./../contact">Contact US</a></div>
+        <div class="col col-sm-4 col-md-4 col-lg-4"><a href="./../contact/">Contact US</a></div>
         <div class="col col-sm-4 col-md-4 col-lg-4"><a href="./../privacypolicy/">Privacy Policy</a></div>
-        <div class="col col-sm-4 col-md-4 col-lg-4"><a href="./../about">About</a></div>
+        <div class="col col-sm-4 col-md-4 col-lg-4"><a href="./../about/">About</a></div>
       </div>
       <div class="container text-muted row">
         <span class="col col-sm-6 col-md-6 col-lg-6"> GMJNOW LLC © 2020</span>
       </div>
 
       <br />
-      <div>DISCLAIMER: NO INVESTMENT ADVICE. Futures, stocks and options trading involves substantial risk
+      <div class="text-muted">DISCLAIMER: NO INVESTMENT ADVICE. Futures, stocks and options trading involves substantial risk
       of loss. An individual should never invest in the securities of any of the companies' mentioned based
       solely on information contained on our website. These are observations. Individuals should assume that all information provided
       regarding companies is not trustworthy unless verified by their own independent research. GMJNOW LLC and its

@@ -1,12 +1,70 @@
 {% extends "websiteBackbone/header.html" %}
+{% block title %}Home{% endblock %}
 {% block content %}
-    <div class="jumbotron jumbotron-fluid">
-<br/>
+<div class="jumbotron jumbotron-fluid">
+                                    <h2>Ticker: {{ stock_ticker_symbol }}</h2>
+                                    <container>
+                                    <img class="img-fluid" src="data:image/png;base64,{{ view_portfolio_plot}}"/>
+                                    </container>
+                                    <h3>Simple Stats: </h3>
+                                    {{ simpleStats }}
+                                    {{ otherData }}
+                                    <p> Screening stocks can help decide quickly using particular indicators
+                                    to determine whether or not a stock is viable to buy, sell, or hold. Knowing a good entrypoint
+                                    of when to invest can maximize profits. The following rules are utilized to see if a stock has a BuySignal.
+                                    <ol>
+                                     <li>Current Price is greater than the 150 day simple moving average (SMA) which is greater than  200 day SMA</li>
+                                     <li>150 day simple moving average (SMA) > 200 day moving average</li>
+                                     <li>200 day SMA has been trending for 1 month</li>
+                                     <li>Current Price is greater than the 50 day SMA</li>
+                                     <li>Current Price is 30% Greater than 52 week low</li>
+                                     <li>Current price is within 25% of 52 week high</li>
+                                     <li>RSI (see below) is greater than 70</li>
+                                    <li>Yield > 4%</li>
+                                    <li>Earnings Per Share > 0</li>
+                                    <li>Price/Earnings Ratio < 25</li>
+                                    </ol>
+                                    <ol>
+                                    Indicators to be incorporated soon:
+                                     <li>Coming Soon: Payout Ratio < 90</li>
+                                     <li>Coming Soon: PGO Indicator</li>
+                                     <li>Coming Soon: Email Alerts</li>
+                                     </ol>
+                                        <h3>Green Dot Indicators: </h3>
+                                    <p>GDIs help determine Entry points that are in overall long term and short term uptrend.
+                                    Optimal buying time is typically within 1-3 days of a Green Dot appearingThis
+                                    looks for the 10.4 stochastic crosses above 4 day SMA after being oversold.
+                                    <a target=_blank href=https://wishingwealthblog.com/2018/03/green-dot-strategy-defined/> More Info</a></p>
+                                    {{ green_line_values }}
+                                    <br />
+                                    <p>Another method of determining an entrypoing is using simple moving averages. Below is a visualiztion with buy and
+                                        sell indicators using simple moving averages (30 day vs 100 day window).
+                                    As the shorter SMA (30) rises above the longer (100) SMA, this is a signal to buy meanwhile the opposite can be said
+                                    when the shorter SMA (30) falls below the longer (100) SMA. You can also see some of these crossing points using smaller SMAs
+                                    in the first graph on this page. As you can see (probably) is that the Sell indicator isn't the strongest; however,
+                                    using this for long term buys could prove successful.</p>
+                                        <p><img class="img-fluid" src="data:image/png;base64,{{ viewBuySellMA}}"/></p>
+                                    <p> Relative Strength Index (RSI) is utilized to determine if a stock is overbought or oversold. By
+                                     analyzing the average gain / average loss on a day-to-day basis and normalizing that data, we can see if
+                                     a particular ticker is oversold and ready to be bought. The RSI oscillates between zero and 100. Traditionally,
+                                      the RSI is considered overbought when above 70 and oversold when below 30 typically meaning people do not want this stock.</p>
+                                            <container><img class="img-fluid" src="data:image/png;base64,{{ viewShowRSI}}"/></container>
+</div>
+                                <div class="jumbotron jumbotron-fluid">
+                                    <h3>Short term Price Prediction using Machine Learning :</h3>
+                                    <p>Accuracy: {{ confidence }}</p>
+                                    <p>Predicted Spread: {{ result }}</p>
+                                    <p>The "Predicted Spread" is a backtest that makes a call whether to Hold, Buy, or Sell
+                                    which compares three voting algorithms and chooses the most accurate of Linear SVC, RandomForestClassifier,
+                                    and KNeighbors. using the entire history of the ticker</p>
+                                    <p>The below chart predicts the price of a stock for a specific day
+                                         using the ML algorithm called Support Vector Regression (SVR) Model.\n
+                                         Typically, the RBF kernel/model is most accurate using 65% of data to train and 35% to test witht he past 30 days</p
+                                    <container><img class="img-fluid" src="data:image/png;base64,{{ viewSVR}}"/></container>
 
-                        <p>This application analyzes recent stock ticker data of the <a href="https://en.wikipedia.org/wiki/List_of_S%26P_500_companies" target="_blank">S&P 500</a> to suggest whether a stock is in an optimal purchasing position</p>
-                        <p> Each analysis takes ~2 minutes</p>
-                    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-                    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-                    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-    </div>
+                                    <p>Predicting Stock market using Decisiontree regressor model and linear regression model\n
+                                    Using 75% of data to train and 25% to test</p>
+                                    <container><img class="img-fluid" src="data:image/png;base64,{{ viewdecisionTree}}"/></container>
+
+                                </div>
 {% endblock %}
