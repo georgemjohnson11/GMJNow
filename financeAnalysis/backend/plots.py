@@ -225,7 +225,7 @@ def showRSI(ticker):
 
     plt.figure(figsize=(12, 8))
     fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
-    plt.plot(tickers.index, tickers['RSI'], label=ticker, alpha=0.35, color='#ED6A5A')
+    plt.plot(tickers.index, tickers['RSI'], label=ticker, alpha=0.35, color='#5BAAD7')
     plt.axhline(0, linestyle='--', alpha=0.5, color='grey')
     plt.axhline(10, linestyle='--', alpha=0.5, color='green')
     plt.axhline(20, linestyle='--', alpha=0.5, color='orange')
@@ -291,7 +291,7 @@ def showBuySellPoints(ticker):
     for x in smasUsed:  # This for loop calculates the EMAs for te stated periods and appends to dataframe
         sma = x
         tickers['SMA' + str(sma)].plot(label='SMA' + str(sma), alpha=0.35)
-    plt.scatter(tickers.index, tickers['Buy_Signal_Price'], label='BUY', marker='^', s=32, color='#ED6A5A')
+    plt.scatter(tickers.index, tickers['Buy_Signal_Price'], label='BUY', marker='^', s=32, color='#5BAAD7')
     plt.scatter(tickers.index, tickers['Sell_Signal_Price'], label='SELL', marker='v', s=32, color='#006989')
     plt.title(ticker + ' Adj Close Price History with Buy and Sell Signals')
     plt.xlabel(str(tickers.index[0]) + ' - ' + str(tickers.index[-1]))
@@ -338,7 +338,7 @@ def svr_prediction_build_plot(ticker):
     fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(13, 8))  # Create Plots
     plt.scatter(dates, closing_price, color='#006989', label=ticker)
     plt.plot(dates, svr_lin.predict(dates_list), color='red', label='SVR Linear Model')
-    plt.plot(dates, svr_poly.predict(dates_list), color='#ED6A5A', label='SVR Poly Model')
+    plt.plot(dates, svr_poly.predict(dates_list), color='#5BAAD7', label='SVR Poly Model')
     plt.plot(dates, svr_rbf.predict(dates_list), color='#2B9720', label='SVR RBF Model')
     ax1.set_xlabel('Date')
     ax1.set_ylabel('Price')
