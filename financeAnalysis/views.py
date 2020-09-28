@@ -2,7 +2,7 @@ from .backend.MLBuySell import do_ml
 from .backend.StockScreener import movingAverageAnalysis
 from .backend.GL_loop import GL_calculator
 from .backend.plots import *
-from .finance_form import FinanceForm
+from financeAnalysis.finance_form import FinanceForm
 from django.shortcuts import render, get_object_or_404
 import os
 from django.urls import reverse
@@ -17,20 +17,21 @@ class financeAnalysisDetail():
 
     def analysis_page(request):
         errors = ""
+
         if request.method == "POST":
             form = FinanceForm(request.POST)
             if form.is_valid():
                 stock_ticker_symbol = form.cleaned_data['stock_ticker_symbol']
             if os.path.exists('stock_dfs/{}.csv'.format(stock_ticker_symbol)):
-                portfolio_plot = displayPortfolioGraph(stock_ticker_symbol)
+                portfolio_plot = retrieve_base64_ticker_overview_fig(stock_ticker_symbol)
                 print("portfolio complete")
-                svr_prediction_plot = svr_prediction_build_plot(stock_ticker_symbol)
+                svr_prediction_plot = retrieve_base64__svr_prediction_build_fig(stock_ticker_symbol)
                 print("svr learning complete")
                 simpleStatsTable, otherDataTable = movingAverageAnalysis(stock_ticker_symbol)
                 print("simplestats complete")
-                decision_tree_plot = decisionTreePrediction(stock_ticker_symbol)
-                buy_sell_moving_avg_plot = showBuySellPoints(stock_ticker_symbol)
-                rsi_plot = showRSI(stock_ticker_symbol)
+                decision_tree_plot = retrieve_base64_decisionTreePrediction_fig(stock_ticker_symbol)
+                buy_sell_moving_avg_plot = retrieve_base64__buy_sell_points_fig(stock_ticker_symbol)
+                rsi_plot = retrieve_base64_rsi_fig(stock_ticker_symbol)
                 list_green_line_values = GL_calculator(stock_ticker_symbol)
                 confidence, result = do_ml(stock_ticker_symbol)
                 print("machine learning complete")

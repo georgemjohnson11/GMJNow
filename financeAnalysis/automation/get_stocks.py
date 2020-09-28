@@ -10,6 +10,7 @@ import pandas as pd
 import numpy as np
 import pandas_datareader.data as web
 from pandas_datareader._utils import RemoteDataError
+from .get_plots import make_plots
 
 def save_sp500_tickers():
     wikipediaLink = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
@@ -61,10 +62,17 @@ def get_data_from_yahoo(reload_sp500=False):
     start = dt.datetime(2015, 1, 1)
     for row in save_nyse_ticker():
         write_to_csv_pickle_no_date(row, start)
+        if os.path.exists('stock_dfs/{}.pickle'.format(row)):
+            make_plots(row)
     for row in save_nasdaq_ticker():
         write_to_csv_pickle_no_date(row, start)
+        if os.path.exists('stock_dfs/{}.pickle'.format(row)):
+            make_plots(row)
     for row in tickers.iterrows():
         write_to_csv_pickle_no_date(row[1]['Ticker'], start=row[1]['StartDate'])
+        if os.path.exists('stock_dfs/{}.pickle'.format(row)):
+            make_plots(row)
+
 
 def write_to_csv_pickle_no_date(row, start):
     end = dt.datetime.now()
