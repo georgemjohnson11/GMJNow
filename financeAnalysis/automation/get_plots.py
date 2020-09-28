@@ -179,6 +179,7 @@ def ticker_overview(stock_ticker_symbol):
     plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
     with open(filename, 'wb') as f:
         pl.dump(plot_url, f)
+    plt.close()
     return stock_ticker_symbol
 
 
@@ -205,6 +206,7 @@ def decisionTreePrediction(stock_ticker_symbol):
     plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
     with open(filename, 'wb') as f:
         pl.dump(plot_url, f)
+    plt.close()
     return stock_ticker_symbol
 
 
@@ -252,8 +254,10 @@ def showRSI(stock_ticker_symbol):
     filename = 'stock_dfs/' + stock_ticker_symbol + '_rsi_fig.pickle'
     img.seek(0)
     plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-    with open(filename, 'wb') as f:
-        pl.dump(plot_url, f)
+    if tickers is not None:
+      with open(filename, 'wb') as f:
+          pl.dump(plot_url, f)
+    plt.close()
     return stock_ticker_symbol
 
 
@@ -315,6 +319,7 @@ def show_buy_sell_points(stock_ticker_symbol):
     plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
     with open(filename, 'wb') as f:
         pl.dump(plot_url, f)
+    plt.close()
     return stock_ticker_symbol
 
 
@@ -367,6 +372,7 @@ def svr_prediction_build_plot(stock_ticker_symbol):
     plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
     with open(filename, 'wb') as f:
         pl.dump(plot_url, f)
+    plt.close()
     return stock_ticker_symbol
 
 if __name__ == "__main__":
