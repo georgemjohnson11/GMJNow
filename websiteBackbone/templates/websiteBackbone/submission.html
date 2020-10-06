@@ -1,8 +1,10 @@
 {% extends "websiteBackbone/header.html" %}
 {% block content %}
-    <div class=jumbotron">
+    <div class="jumbotron jumbotron-fluid">
     {%  for c in content %}
-        <h4>{{c}}</h4>
+        <container>
+            <h2>{{c}}</h2>
+        </container>
     {%  endfor %}
     </div>
 {%  endblock %}

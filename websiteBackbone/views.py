@@ -1,10 +1,13 @@
 from django.conf import settings
 from django.shortcuts import render
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.contrib import messages
 from django.http import HttpResponse, BadHeaderError, HttpResponseRedirect
 from .contactform import ContactForm
 
+
+def about(request):
+    return render(request, './websiteBackbone/about.html')
 
 def index(request):
     return render(request, './websiteBackbone/home.html')
@@ -35,7 +38,10 @@ def contact(request):
             if cc_myself:
                 recipients.append(contactEmail)
             try:
-                send_mail(contactSubject, contactMessage, contactEmail, recipients, fail_silently=True)
+                email = EmailMessage(contactSubject, contactMessage, settings.DEFAULT_FROM_EMAIL, recipients)
+                email.send()
+            except KeyError:
+                return HttpResponse('Please fill in all fields')
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
             return HttpResponseRedirect('/submission/')

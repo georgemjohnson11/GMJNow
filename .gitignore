@@ -84,6 +84,15 @@ target/
 *.pyc
 __pycache__/
 local_settings.py
+.pyc
 
 .env
 db.sqlite3
+.idea
+static/
+stock_dfs/
+websiteBackbone/css
+websiteBackbone/js
+websiteBackbone/fonts
+venv/
+.swp

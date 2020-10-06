@@ -1,0 +1,5 @@
+__pycache__
+*.pyc
+venv/
+stock_dfs/
+db.sqlite3

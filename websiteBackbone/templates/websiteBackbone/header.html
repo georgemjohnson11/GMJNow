@@ -1,71 +1,90 @@
 <!DOCTYPE html>
 <html>
-      <head>
-        <title>GMJNOW</title>
-          {% load staticfiles %}
-        <meta property="og:image" content= "{% static 'img/navbar_logo_150x85.jpg' %}">
-        <meta property="og:site_name" content="GMJNOW"/>
-          <meta charset="utf-8"/>
-        <meta property="og:description" content="GMJNOW is a computer technology company specializing in engineering quality top-to-bottom full stack software architecture (design, development, deployments, and maintenance); automating, manufacturing, and supporting cloud-based IT infrastructure; and artificial intelligence driven solutions."/>
-        <meta property="og:type" content="blog"/>
-        <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico'  %}">
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-      </head>
-      <body>
-
-    <header>
-
-        <di></di>
-      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark border-radius=20%">
-        <a class="navbar-brand" href="../#"><img src= "{%  static 'img/navbar_logo_150x85.jpg' %}"></a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+<head>
+    <title>GMJNOW</title>
+    {% load static %}
+    <meta property="og:image" content="{% static 'img/navbar_logo_150x85.jpg' %}">
+    <meta property="og:site_name" content="GMJNOW"/>
+    <meta charset="utf-8"/>
+    <meta property="og:description"
+          content="GMJNOW is a computer finance technology company specializing in engineering quality top-to-bottom full stack software architecture (design, development, deployments, and maintenance); automating, manufacturing, and supporting cloud-based IT infrastructure; and artificial intelligence driven solutions."/>
+    <meta property="og:type" content="finance"/>
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/style.css">
+    <script data-ad-client="ca-pub-2028725223208251" async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-expand-md fixed-top navbar-light" style="background-color: #044962;">
+        <a class="navbar-brand" href="../#"><img src="{% static 'img/navbar_logo_150x85.jpg' %}"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="./../#">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item active">
-              <a class="nav-link" href="./../posts/">Blog</a>
-            </li>
-            <li class="nav-item active">
-              <a class="nav-link" href="./../contact/">Contact</a>
-            </li>
-          </ul>
-          <form class="form-inline mt-2 mt-md-0">
-            <input class="form-control mr-sm-2" type="text" placeholder="GMJnow..." aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-          </form>
+            <form class="row text-center" style="width: 75%;" method="post" action="./../finance/">
+                {% csrf_token %}
+                <div class="col pr-1">
+                    <input class="form-control searchFieldText" type="text" maxlength="7" label="stock_ticker_symbol"
+                           onkeyup="this.value = this.value.toUpperCase();" name="stock_ticker_symbol"
+                           id="stock_ticker_symbol"
+                           placeholder="Enter Stock Symbol (e.g. AAPL, AMD, AMZN)" value="{{ stock_ticker_symbol }}"
+                           aria-label="Search">
+                </div>
+                <div class="col-auto px-0">
+                    <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0" type="submit">Search</button>
+                </div>
+            </form>
         </div>
-      </nav>
-    </header>
+    </nav>
+</header>
 
-    <!-- Begin page content -->
-    <div>
-			<br><br>
-			   {% block content %}
-			   {% endblock %}
-			   <hr>
-		</div>
+<!-- Begin page content -->
+<div style="margin-top: 55px;">
+    {% block content %}
+    {% endblock %}
+    <hr>
+</div>
 
-	<footer class="footer bg-dark">
-      <div class="container text-muted row">
-          <div class="col col-sm-4 col-md-4 col-lg-4"><a href="./../termsconditions/"> Terms and Conditions </a></div>
-          <div class="col col-sm-4 col-md-4 col-lg-4"><a href="mailto:resources@gmjnow.com"> Contact Us </a></div>
-          <div class="col col-sm-4 col-md-4 col-lg-4"><a href="./../privacypolicy/"> Privacy Policy </a></div>
+<footer class="footer bg-dark">
+    <div class="container row">
+        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="./../posts/">Blog</a></button>
+        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="https://mailchi.mp/0aec99988c6b/gmjnow-finance">Subscribe</a></button>
+        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="./../termsconditions/">Terms and Conditions</a></button>
+        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="./../contact/">Contact Us</a></button>
+        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="./../privacypolicy/">Privacy Policy</a></button>
+        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="./../about/">About</a></button>
       </div>
-      <div class="container text-muted row">
-        <span class="col col-sm-6 col-md-6 col-lg-6"> GMJNOW LLC © 2018</span>
+      <div>
+        <span class="col col-sm-6 col-md-6 col-lg-6"> GMJNOW LLC © 2020</span>
       </div>
-  </footer>
-    
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script>window.jQuery || document.write('<script src="{% static 'js/jquery-slim.min.js' %}"><\/script>')</script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-  </body>
+
+      <br />
+      <div class="col">DISCLAIMER: NO INVESTMENT ADVICE. Futures, stocks and options trading involves substantial risk
+      of loss. An individual should never invest in the securities of any of the companies' mentioned based
+      solely on information contained on our website. These are observations. Individuals should assume that all information provided
+      regarding companies is not trustworthy unless verified by their own independent research. GMJNOW LLC and its
+      affiliates are not responsible for any decisions made based on information presented on this website.</div>
+
+
+</footer>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="{% static 'js/jquery-slim.min.js' %}"><\/script>')</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+        integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+        crossorigin="anonymous"></script>
+</body>
 </html>
