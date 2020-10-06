@@ -4,9 +4,10 @@
 import numpy as np
 import pandas as pd
 from datetime import datetime
-import pandas_datareader as web
 import matplotlib.pyplot as plt
 import pickle
+from django.conf import settings
+import os.path
 
 
 #Get the stock symbols for the portfolio
@@ -21,9 +22,7 @@ import pickle
 #Create a function to get stock prices and portfolio
 
 def getPortfolio(stocks):
-    with open("stock_dfs/{}.pickle".format(stocks), "rb") as f:
-        tickers = pickle.load(f)
-    return tickers
+    return pd.read_pickle(os.path.join(settings.BASE_DIR, "stock_dfs", stocks + ".pickle"))
 
 def showPortfolioGraph(stocks, col = 'Adj Close'):
 

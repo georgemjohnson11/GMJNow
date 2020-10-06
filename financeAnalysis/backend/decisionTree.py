@@ -8,11 +8,12 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import pickle
+from django.conf import settings
+import os.path
 
 def decisionTreePredictPrice(ticker):
     # collect the data
-    with open("stock_dfs/{}.pickle".format(ticker), "rb") as f:
-        tickers = pickle.load(f)
+    tickers = pd.read_pickle(os.path.join(settings.BASE_DIR, "stock_dfs", ticker + ".pickle"))
     future_days = 25
     #Create a new column (target) shifted 'x' units/days up
     tickers['Prediction'] = tickers['Adj Close'].shift(-future_days)

@@ -5,6 +5,8 @@ from sklearn.model_selection import cross_validate
 import numpy as np
 import pandas as pd
 import pickle
+import os.path
+from django.conf import settings
 
 
 #Percent Change based ML algorithm to BUY/Sell
@@ -12,7 +14,7 @@ import pickle
 
 def process_data_for_labels(ticker):
     hm_days = 7
-    df = pd.read_csv('stock_dfs/sp500_adjcloses.csv', index_col=0)
+    df = pd.read_csv(os.path.join(settings.BASE_DIR, 'stock_dfs','sp500_adjcloses.csv'), index_col=0)
     tickers = df.columns.values.tolist()
     df.fillna(0, inplace=True)
 
@@ -62,9 +64,7 @@ def extract_feature_sets(ticker):
     return X, y, df
 
 def do_ml(ticker):
-    with open("stock_dfs/sp500tickers.pickle", "rb") as f:
-        tickers = pickle.load(f)
-    df = pd.read_csv('stock_dfs/sp500_adjcloses.csv', index_col=0)
+    df = pd.read_csv(os.path.join(settings.BASE_DIR,'stock_dfs', 'sp500_adjcloses.csv'), index_col=0)
     if ticker in df.columns:
         X, y, df = extract_feature_sets(ticker)
 
@@ -82,8 +82,17 @@ def do_ml(ticker):
         #pickle the predictions to save them for future training
 
         print('Predicted spread: ', Counter(predictions))
+        print('Predicted confidence: ', confidence)
+
+        filepath = os.path.join(settings.BASE_DIR, "stock_dfs", ticker + "_ml_predictions.pickle")
+        with open(filepath, "wb") as f:
+            pickle.dump(Counter(predictions), f)
+
+        filepath = os.path.join(settings.BASE_DIR, "stock_dfs", ticker + "_ml_confidence.pickle")
+        with open(filepath, "wb") as f:
+            pickle.dump(confidence, f)
     else:
         confidence = "N/A"
         predictions = "N/A"
-    return confidence, Counter(predictions)
+    return predictions, confidence
 

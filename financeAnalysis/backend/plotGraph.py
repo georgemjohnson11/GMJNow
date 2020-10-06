@@ -2,7 +2,6 @@
 import yfinance as yf
 import datetime as dt
 import pandas as pd
-from pandas_datareader import data as pdr
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as mticker

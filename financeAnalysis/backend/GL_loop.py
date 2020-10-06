@@ -1,12 +1,12 @@
 import yfinance as yf
 import datetime as dt
 import pandas as pd
-from pandas_datareader import data as pdr
 import pickle
+from django.conf import settings
+import os.path
 
 def GL_calculator(ticker):
-  with open("stock_dfs/{}.pickle".format(ticker), "rb") as f:
-    tickers = pickle.load(f)
+  tickers = pd.read_pickle(os.path.join(settings.BASE_DIR, "stock_dfs", ticker + ".pickle"))
 
   tickers.drop(tickers[tickers["Volume"]<1000].index, inplace=True)
 

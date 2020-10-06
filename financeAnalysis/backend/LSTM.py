@@ -2,7 +2,6 @@
 #Long Short Term Memory LSTM to predict stocks using past 60 days
 
 import math
-import pandas_datareader as web
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
@@ -117,21 +116,3 @@ def lstm_prediction_build_plot(ticker):
     img.seek(0)
     plot_url = base64.b64encode(img.getvalue()).decode()
     return '<img src="data:image/png;base64,{}">'.format(plot_url)
-
-def backtestLSTM():
-    #Get the quote to predict 12-18 price
-    apple_quote = web.DataReader('AAPL', data_source='yahoo', start='2012-01-01', end='2019-12-17')
-    #Get the last 60 days close price
-    new_df = apple_quote.filter(['Close'])
-    last_60_days = new_df[-60:].values
-    #scale the data to be values between 0-1
-    last_60_days_scaled = scalar.transform(last_60_days)
-    #add last 60 days to new numpy array
-    X_test = []
-    X_test.append((last_60_days_scaled))
-    X_test.np.array(X_test)
-    X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
-    #Get predicted scaled price
-    pred_price = model.predict(X_test)
-    pred_price = scalar.inverse_transform(pred_price)
-    print(pred_price)

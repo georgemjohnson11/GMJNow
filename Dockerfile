@@ -3,6 +3,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 RUN mkdir /app
+RUN mkdir /app/stock_dfs
 
 ADD ./requirements.txt /app/requirements.txt
 
@@ -17,4 +18,4 @@ ENV PATH /env/bin:$PATH
 
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "Blog.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "--log-level", "debug", "--timeout", "300", "Blog.wsgi:application"]

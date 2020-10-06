@@ -2,78 +2,108 @@
 {% block title %}Home{% endblock %}
 {% block content %}
     <div class="jumbotron jumbotron-fluid">
-        <h2>Ticker: {{ stock_ticker_symbol }}</h2>
+        <h2>Stock Ticker Symbol: {{ stock_ticker_symbol }}</h2>
         <container>
             <img class="img-fluid" src="data:image/png;base64,{{ view_portfolio_plot }}"/>
         </container>
+        <p>
+            The plot above uses daily data across the last year and displays some peaks, simple moving averages (SMA),
+            and
+            Bollinger Bands <br/>
+            SMAs can be used to help identify upward and downward trends for a particular stock especially when
+            averaging different
+            intervals. This plot utilizes 10 day, 30 day, and 50 day averages. Further below is an example with 30 day,
+            100 day, and
+            200 day moving averages <br/>
+            Developed by John Bollinger, Bollinger Bands are volatility bands placed above and below a moving average.
+            Volatility is based on the standard deviation, which changes as volatility increases and decreases. The
+            bands
+            automatically widen when volatility increases and contract when volatility decreases.
+        </p>
         <h3>Simple Stats: </h3>
         {{ simpleStats|safe }}
-        {{ otherData|safe }}
+        <br/>
         <p> Screening stocks can help decide quickly using particular indicators
             to determine whether or not a stock is viable to buy, sell, or hold. Knowing a good entrypoint
-            of when to invest can maximize profits. The following rules are utilized to see if a stock has a BuySignal.
+            of when to invest can maximize profits. The above indicators are utilized to determine the final column
+            <strong>Buy Signal</strong> using the below rules
         <ol>
             <li>Current Price is greater than the 150 day simple moving average (SMA) which is greater than 200 day
                 SMA
             </li>
-            <li>150 day simple moving average (SMA) > 200 day moving average</li>
+            <li>150 day SMA > 200 day moving average</li>
             <li>200 day SMA has been trending for 1 month</li>
             <li>Current Price is greater than the 50 day SMA</li>
             <li>Current Price is 30% Greater than 52 week low</li>
             <li>Current price is within 25% of 52 week high</li>
             <li>RSI (see below) is greater than 70</li>
-            <li>Yield > 4%</li>
-            <li>Earnings Per Share > 0</li>
-            <li>Price/Earnings Ratio < 25</li>
         </ol>
         <ol>
             Indicators to be incorporated soon:
+            <li>Coming Soon: Yield > 4%</li>
+            <li>Coming Soon: Earnings Per Share > 0</li>
+            <li>Coming Soon: Price/Earnings Ratio < 25</li>
             <li>Coming Soon: Payout Ratio < 90</li>
             <li>Coming Soon: PGO Indicator</li>
             <li>Coming Soon: Email Alerts</li>
         </ol>
-        <h3>Green Dot Indicators: </h3>
-        <p>GDIs help determine Entry points that are in overall long term and short term uptrend.
-            Optimal buying time is typically within 1-3 days of a Green Dot appearingThis
+        <h3>Green Dot Indicators (GDI): </h3>
+        <p>GDIs help determine entry points that are in overall long term and short term uptrend.
+            Optimal buying time is typically within 1-3 days of a green dot appearing.This
             looks for the 10.4 stochastic crosses above 4 day SMA after being oversold.
             <a target=_blank href=https://wishingwealthblog.com/2018/03/green-dot-strategy-defined/> More Info</a></p>
         {{ green_line_values|safe }}
         <br/>
-        <p>Another method of determining an entrypoing is using simple moving averages. Below is a visualiztion with buy
+        <h3>Simple Moving Averages (SMAs): </h3>
+        <p><img class="img-fluid" src="data:image/png;base64,{{ viewBuySellMA }}"/></p>
+        Above is a visualization
+            with buy
             and
-            sell indicators using simple moving averages (30 day vs 100 day window).
+            sell indicators using SMAs (30 day vs 100 day window).
             As the shorter SMA (30) rises above the longer (100) SMA, this is a signal to buy meanwhile the opposite can
             be said
             when the shorter SMA (30) falls below the longer (100) SMA. You can also see some of these crossing points
             using smaller SMAs
-            in the first graph on this page. As you can see (probably) is that the Sell indicator isn't the strongest;
+        in the first graph on this page. The <strong>Sell</strong> indicator isn't the strongest;
             however,
             using this for long term buys could prove successful.</p>
-        <p><img class="img-fluid" src="data:image/png;base64,{{ viewBuySellMA }}"/></p>
-        <p> Relative Strength Index (RSI) is utilized to determine if a stock is overbought or oversold. By
+        <h3>Relative Strength Index (RSI): </h3>
+        <container><img class="img-fluid" src="data:image/png;base64,{{ viewShowRSI }}"/></container>
+    <p> RSI is utilized to determine if a stock is overbought or oversold. By
             analyzing the average gain / average loss on a day-to-day basis and normalizing that data, we can see if
             a particular ticker is oversold and ready to be bought. The RSI oscillates between zero and 100.
             Traditionally,
             the RSI is considered overbought when above 70 and oversold when below 30 typically meaning people do not
             want this stock.</p>
-        <container><img class="img-fluid" src="data:image/png;base64,{{ viewShowRSI }}"/></container>
     </div>
     <div class="jumbotron jumbotron-fluid">
         <h3>Short term Price Prediction using Machine Learning :</h3>
         <p>Accuracy: {{ confidence }}</p>
         <p>Predicted Spread: {{ result }}</p>
-        <p>The "Predicted Spread" is a backtest that makes a call whether to Hold, Buy, or Sell
+        <p>The "Predicted Spread" is a backtest that makes a call whether to Hold, <strong>Buy</strong>, or Sell
             which compares three voting algorithms and chooses the most accurate of Linear SVC, RandomForestClassifier,
             and KNeighbors. using the entire history of the ticker</p>
-        <p>The below chart predicts the price of a stock for a specific day
-            using the ML algorithm called Support Vector Regression (SVR) Model.\n
-            Typically, the RBF kernel/model is most accurate using 65% of data to train and 35% to test witht he past 30
-            days</p
+        <hr>
+        <h3>Support Vector Regression (SVR)</h3>
         <container><img class="img-fluid" src="data:image/png;base64,{{ viewSVR }}"/></container>
-
-        <p>Predicting Stock market using Decisiontree regressor model and linear regression model\n
-            Using 75% of data to train and 25% to test</p>
+        <p>The above chart predicts the price of a stock for a specific day
+            using the ML algorithm called Support Vector Regression (SVR) Model.<br/>
+            Typically, the RBF kernel/model is most accurate using 65% of data to train and 35% to test with the past 30
+            days</p>
+        <hr>
+        <h3>Decision Tree Model</h3>
+        <p>The primary difference between classification and regression decision trees is that, the classification
+            decision
+            trees are built with unordered values with dependent variables. The regression decision trees take ordered
+            values with continuous values.
+            Decision tree builds regression or classification models in the form of a tree structure. It breaks down a
+            dataset into smaller and smaller subsets
+            while at the same time an associated decision tree is incrementally developed. The final result is a tree
+            with decision nodes and leaf nodes.
+        </p>
         <container><img class="img-fluid" src="data:image/png;base64,{{ viewdecisionTree }}"/></container>
+        <p>Predicting Stock market using Decisiontree regressor model and linear regression model <br/>
+            Using 75% of data to train and 25% to test</p>
 
     </div>
 {% endblock %}

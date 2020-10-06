@@ -106,7 +106,6 @@ def get_data_from_yahoo(reload_sp500=False):
             df = web.DataReader(tickerName, data_source='yahoo', start=row[1]['StartDate'], end=end)
             df.reset_index(inplace=True)
             df.set_index("Date", inplace=True)
-            df.to_csv('stock_dfs/{}.csv'.format(row[1]['Ticker']))
             with open("stock_dfs/{}.pickle".format(tickerName), "wb") as f:
                 pickle.dump(df, f)
         else:
@@ -121,7 +120,7 @@ def compile_data_to_columns():
     main_df = pd.DataFrame()
 
     for count, ticker in enumerate(tickers['Ticker']):
-        df = pd.read_csv('stock_dfs/{}.csv'.format(ticker))
+        df = pd.read_csv('stock_dfs/{}.pickle'.format(ticker))
         df.set_index('Date', inplace=True)
 
         df.rename(columns = {'Adj Close': ticker}, inplace=True)

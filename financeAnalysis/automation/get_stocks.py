@@ -115,7 +115,8 @@ def compile_data_to_columns():
     main_df = pd.DataFrame()
 
     for count, ticker in enumerate(tickers['Ticker']):
-        df = pd.read_csv('stock_dfs/{}.csv'.format(ticker))
+        with open('stock_dfs/{}.pickle'.format(ticker), "rb") as f:
+            df = pickle.load(f)
         df.set_index('Date', inplace=True)
 
         df.rename(columns = {'Adj Close': ticker}, inplace=True)

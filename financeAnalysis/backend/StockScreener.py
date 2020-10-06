@@ -6,7 +6,6 @@ import json
 import argparse
 from collections import OrderedDict
 from .portfolioManagement import getPortfolio
-from pandas_datareader._utils import RemoteDataError
 
 
 def get_headers():
@@ -75,19 +74,19 @@ def movingAverageAnalysis(ticker):
 	otherDataList = pd.DataFrame(columns=["Earning Per Share", "Price to Earnings Ratio","Forward Dividend & Yield", "Earnings Date", "Last Dividend Date", "1y Target Est", "Day's Range","url"])
 	try:
 		df = getPortfolio(ticker)[-400:]
-		summary = parse(ticker)
-		print(summary)
-		pe = summary["PE Ratio (TTM)"]
-		eps = summary["EPS (TTM)"]
-		pctyield = summary["Forward Dividend & Yield"]
-		earningsdate= summary["Earnings Date"]
-		lastdividenddate = summary["Ex-Dividend Date"]
-		one_year_est = summary["1y Target Est"]
-		daysRange = summary["Day's Range"]
-		reference = summary["url"]
-		if(pe):
-			otherDataList = otherDataList.append({"Earning Per Share": eps, "Price to Earnings Ratio":pe,"Forward Dividend & Yield": pctyield, "Earnings Date": earningsdate, "Last Dividend Date": lastdividenddate, "1y Target Est": one_year_est, "Day's Range": daysRange, "url": reference}, ignore_index=True)
-			print(otherDataList)
+		# summary = parse(ticker)
+		# print(summary)
+		# pe = summary["PE Ratio (TTM)"]
+		# eps = summary["EPS (TTM)"]
+		# pctyield = summary["Forward Dividend & Yield"]
+		# earningsdate= summary["Earnings Date"]
+		# lastdividenddate = summary["Ex-Dividend Date"]
+		# one_year_est = summary["1y Target Est"]
+		# daysRange = summary["Day's Range"]
+		# reference = summary["url"]
+		# if(pe):
+		# 	otherDataList = otherDataList.append({"Earning Per Share": eps, "Price to Earnings Ratio":pe,"Forward Dividend & Yield": pctyield, "Earnings Date": earningsdate, "Last Dividend Date": lastdividenddate, "1y Target Est": one_year_est, "Day's Range": daysRange, "url": reference}, ignore_index=True)
+		# 	print(otherDataList)
 		smaUsed=[50,150,200]
 		for x in smaUsed:
 			sma=x
@@ -167,36 +166,36 @@ def movingAverageAnalysis(ticker):
 		else:
 			cond_8=False
 		# P/ E < 25
-		if (pe < 25):
-			cond_9 = True
-		else:
-			cond_9 = False
-		# EPS (earning per share) > 0
-		if (eps > 0):
-			cond_10 = True
-		else:
-			cond_10 = False
-		if (eps > 0):
-			cond_10 = True
-		else:
-			cond_10 = False
-		#Other Conditions: Yield > 4%
-		if (pctyield.split(' (')[1][2] > 0):
-			cond_11 = True
-		else:
-			cond_11 = False
-		#Payout Ratio <90
-		if (eps):
-			cond_9 = True
-			cond_10 = True
-			cond_11 = True
+		# if (pe < 25):
+		# 	cond_9 = True
+		# else:
+		# 	cond_9 = False
+		# # EPS (earning per share) > 0
+		# if (eps > 0):
+		# 	cond_10 = True
+		# else:
+		# 	cond_10 = False
+		# if (eps > 0):
+		# 	cond_10 = True
+		# else:
+		# 	cond_10 = False
+		# #Other Conditions: Yield > 4%
+		# if (pctyield.split(' (')[1][2] > 0):
+		# 	cond_11 = True
+		# else:
+		# 	cond_11 = False
+		# #Payout Ratio <90
+		# if (eps):
+		# 	cond_9 = True
+		# 	cond_10 = True
+		# 	cond_11 = True
 
 
-		if(cond_1 and cond_2 and cond_3 and cond_4 and cond_5 and cond_6 and cond_7 and cond_8 and cond_9 and cond_10 and cond_11):
+		if(cond_1 and cond_2 and cond_3 and cond_4 and cond_5 and cond_6 and cond_7 and cond_8):
 			exportList = exportList.append({"50 Day SMA": moving_average_50, "150 Day SMA": moving_average_150, "200 Day SMA": moving_average_200, "52 Week Low": low_of_52week, "52 week High": high_of_52week, "RSI": current_RSI, "Buy Signal": 'Yes'}, ignore_index=True)
-			return exportList, otherDataList
+			return exportList
 	except Exception:
 		print("No data on "+ticker)
 	exportList = exportList.append({"50 Day SMA": moving_average_50, "150 Day SMA": moving_average_150, "200 Day SMA": moving_average_200, "52 Week Low": low_of_52week, "52 week High": high_of_52week, "RSI": current_RSI, "Buy Signal": 'No'}, ignore_index=True)
-	return exportList, otherDataList
+	return exportList
 
