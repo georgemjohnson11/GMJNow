@@ -31,14 +31,16 @@ python3 manage.py runserver 127.0.0.1:8000
 7. Go in your browser to '127.0.0.1:8000'
 
 
-## Deploying
+## Deploying   
 The nginx.conf can be dropped in `/etc/nginx/conf.d/` and should serve up traffic if you insert your domain approopriately and get SSL certs on the EC2 instance
-Docker command: `docker run -d -p 8000:8000  \
+Docker command:   
+`docker run -d -p 8000:8000  \
 --mount type=bind,source="/${pwd}/stock_dfs/",target=/app/stock_dfs,readonly \
 --mount type=bind,source="/${pwd}/static/",target=/app/static,readonly \
---name finance-app gmjnow`
+--name finance-app gmjnow`   
+   
 
-##TO DO
+##TO DO   
 8. Save Model using [Mongo DB](https://django-mongodb-engine.readthedocs.io/en/latest/tutorial.html)
 6. Change static file asset hosting
 5. Separate AI from basic information
