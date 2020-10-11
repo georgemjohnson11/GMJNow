@@ -41,15 +41,14 @@ Docker command:
    
 
 ##TO DO   
-8. Save Model using [Mongo DB](https://django-mongodb-engine.readthedocs.io/en/latest/tutorial.html)
-6. Change static file asset hosting
 5. Separate AI from basic information
 7. Add Testing
-4. Add Finance Postgres model Backend Find models from C# Project
 7. Use Airflow instead of cron jobs to schedule tasks
-3. Start React frontend - make more modular
+3. Start [React](https://bezkoder.com/django-react-axios-rest-framework/) frontend - make more modular
 2. Utilize simpleAnalysis and positions app
 1. Use mixins to simplify Setup
+6. Change static file asset hosting
+8. Save Model using [Mongo DB](https://django-mongodb-engine.readthedocs.io/en/latest/tutorial.html)
 
 
 ## License
