@@ -10,7 +10,7 @@ class BlogListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(BlogListView,self).get_context_data(**kwargs)
-        posts = Post.objects.all().order_by("-date")
+        posts = Post.objects.all().order_by("-created_on")
         paginator = Paginator(posts, self.paginate_by)
         page = self.request.GET.get('page')
 
