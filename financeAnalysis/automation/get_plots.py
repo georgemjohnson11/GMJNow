@@ -5,6 +5,7 @@ from mplfinance.original_flavor import candlestick_ohlc
 from sklearn.svm import SVR
 import pickle as pl
 import datetime as dt
+import os
 import numpy as np
 from io import BytesIO
 from financeAnalysis.backend.decisionTree import decisionTreePredictPrice
@@ -12,11 +13,26 @@ from financeAnalysis.backend.portfolioManagement import getPortfolio
 import base64
 
 def make_plots(stock_ticker_symbol):
-        svr_prediction_build_plot(stock_ticker_symbol)
-        show_buy_sell_points(stock_ticker_symbol)
-        showRSI(stock_ticker_symbol)
-        decisionTreePrediction(stock_ticker_symbol)
-        ticker_overview(stock_ticker_symbol)
+        try:
+          show_buy_sell_points(stock_ticker_symbol)
+        except Exception as ex:
+          print(ex)
+        try:
+          showRSI(stock_ticker_symbol)
+        except Exception as ex:
+          print(ex)
+        try:
+          svr_prediction_build_plot(stock_ticker_symbol)
+        except Exception as ex:
+          print(ex)
+        try:
+          ticker_overview(stock_ticker_symbol)
+        except Exception as ex:
+          print(ex)
+        try:
+          decisionTreePrediction(stock_ticker_symbol)
+        except Exception as ex:
+          print(ex)
 
 def ticker_overview(stock_ticker_symbol):
     plt.style.use('fivethirtyeight')
@@ -177,6 +193,8 @@ def ticker_overview(stock_ticker_symbol):
     img.seek(0)
     filename = 'stock_dfs/' +stock_ticker_symbol + '_ticker_overview_fig.pickle'
     plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
+    if os.path.exists(filename):
+      os.remove(filename)
     with open(filename, 'wb') as f:
         pl.dump(plot_url, f)
     plt.close()
@@ -185,79 +203,85 @@ def ticker_overview(stock_ticker_symbol):
 
 def decisionTreePrediction(stock_ticker_symbol):
     tickers, valid = decisionTreePredictPrice(stock_ticker_symbol)
-    img = BytesIO()
-    # Plot the models on a graph to see which has the best fit
-    plt.figure(figsize=(12, 8))
-    fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
-    ax1.annotate("Prediction\n Price: $" + str(valid['Prediction'][-1])[0:8],
-                 (valid.index[-1], valid['Prediction'][-1]),
-                 xytext=(valid.index[-1] + dt.timedelta(days=4), valid['Prediction'][-1]), color='#006989', size=10)
-    plt.style.use('fivethirtyeight')
-    plt.title('Decision Tree Prediction')
-    plt.xlabel('Days')
-    plt.plot(tickers['Close'][-200:])
-    plt.plot(valid[['Close', 'Predictions'][-200:]])
-    plt.legend(['Original', 'Valid', 'Prediction'], loc='best', prop={'size': 8})
-    ax1.set_facecolor('#C1DFF0')
-    plt.rcParams['figure.facecolor'] = '#C1DFF0'
-    plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
-    filename = 'stock_dfs/' + stock_ticker_symbol + '_decisionTreePrediction_fig.pickle'
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-    with open(filename, 'wb') as f:
-        pl.dump(plot_url, f)
-    plt.close()
-    return stock_ticker_symbol
+    if tickers is not None and valid is not None:
+      img = BytesIO()
+      # Plot the models on a graph to see which has the best fit
+      plt.figure(figsize=(12, 8))
+      fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
+      ax1.annotate("Prediction\n Price: $" + str(valid['Prediction'][-1])[0:8],
+                   (valid.index[-1], valid['Prediction'][-1]),
+                   xytext=(valid.index[-1] + dt.timedelta(days=4), valid['Prediction'][-1]), color='#006989', size=10)
+      plt.style.use('fivethirtyeight')
+      plt.title('Decision Tree Prediction')
+      plt.xlabel('Days')
+      plt.plot(tickers['Close'][-200:])
+      plt.plot(valid[['Close', 'Predictions'][-200:]])
+      plt.legend(['Original', 'Valid', 'Prediction'], loc='best', prop={'size': 8})
+      ax1.set_facecolor('#C1DFF0')
+      plt.rcParams['figure.facecolor'] = '#C1DFF0'
+      plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
+      filename = 'stock_dfs/' + stock_ticker_symbol + '_decisionTreePrediction_fig.pickle'
+      img.seek(0)
+      plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
+      if os.path.exists(filename):
+        os.remove(filename)
+      with open(filename, 'wb') as f:
+          pl.dump(plot_url, f)
+      plt.close()
+      return stock_ticker_symbol
 
 
 def showRSI(stock_ticker_symbol):
     tickers = getPortfolio(stock_ticker_symbol)[-500:]
     # Calculate RSI
     # Get the difference in daily price
-    delta = tickers['Adj Close'].diff(1)
-    delta = delta.dropna()
-    up = delta.copy()
-    down = delta.copy()
-    up[up < 0] = 0
-    down[down > 0] = 0
+    if tickers is not None:
+      delta = tickers['Adj Close'].diff(1)
+      delta = delta.dropna()
+      up = delta.copy()
+      down = delta.copy()
+      up[up < 0] = 0
+      down[down > 0] = 0
 
-    period = 14
-    AVG_GAIN = up.rolling(window=period).mean()
-    AVG_LOSS = abs(down.rolling(window=period).mean())
+      period = 14
+      AVG_GAIN = up.rolling(window=period).mean()
+      AVG_LOSS = abs(down.rolling(window=period).mean())
 
     # Calculate Relative Strength (RS)
-    tickers['RS'] = AVG_GAIN / AVG_LOSS
-    tickers['RSI'] = 100.0 - (100.0 / (1.0 + tickers['RS']))
-    print(tickers['RSI'])
+      tickers['RS'] = AVG_GAIN / AVG_LOSS
+      tickers['RSI'] = 100.0 - (100.0 / (1.0 + tickers['RS']))
+      print(tickers['RSI'])
     # Calculate RSI
-    img = BytesIO()
+      img = BytesIO()
 
-    plt.figure(figsize=(12, 8))
-    fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
-    plt.plot(tickers.index, tickers['RSI'], label=stock_ticker_symbol, alpha=0.35, color='#5BAAD7')
-    plt.axhline(0, linestyle='--', alpha=0.5, color='grey')
-    plt.axhline(10, linestyle='--', alpha=0.5, color='green')
-    plt.axhline(20, linestyle='--', alpha=0.5, color='orange')
-    plt.axhline(30, linestyle='--', alpha=0.5, color='red')
-    plt.axhline(70, linestyle='--', alpha=0.5, color='red')
-    plt.axhline(80, linestyle='--', alpha=0.5, color='orange')
-    plt.axhline(90, linestyle='--', alpha=0.5, color='green')
-    plt.axhline(100, linestyle='--', alpha=0.5, color='grey')
-    plt.style.use('fivethirtyeight')
-    plt.title(stock_ticker_symbol + ' RSI values and Significant Levels')
-    plt.xlabel(str(tickers.index[0]) + ' - ' + str(tickers.index[-1]))
-    plt.ylabel('RSI')
-    plt.legend(loc='best', prop={'size': 8})
-    ax1.set_facecolor('#C1DFF0')
-    plt.rcParams['figure.facecolor'] = '#C1DFF0'
-    plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
-    filename = 'stock_dfs/' + stock_ticker_symbol + '_rsi_fig.pickle'
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-    if tickers is not None:
-      with open(filename, 'wb') as f:
-          pl.dump(plot_url, f)
-    plt.close()
+      plt.figure(figsize=(12, 8))
+      fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
+      plt.plot(tickers.index, tickers['RSI'], label=stock_ticker_symbol, alpha=0.35, color='#5BAAD7')
+      plt.axhline(0, linestyle='--', alpha=0.5, color='grey')
+      plt.axhline(10, linestyle='--', alpha=0.5, color='green')
+      plt.axhline(20, linestyle='--', alpha=0.5, color='orange')
+      plt.axhline(30, linestyle='--', alpha=0.5, color='red')
+      plt.axhline(70, linestyle='--', alpha=0.5, color='red')
+      plt.axhline(80, linestyle='--', alpha=0.5, color='orange')
+      plt.axhline(90, linestyle='--', alpha=0.5, color='green')
+      plt.axhline(100, linestyle='--', alpha=0.5, color='grey')
+      plt.style.use('fivethirtyeight')
+      plt.title(stock_ticker_symbol + ' RSI values and Significant Levels')
+      plt.xlabel(str(tickers.index[0]) + ' - ' + str(tickers.index[-1]))
+      plt.ylabel('RSI')
+      plt.legend(loc='best', prop={'size': 8})
+      ax1.set_facecolor('#C1DFF0')
+      plt.rcParams['figure.facecolor'] = '#C1DFF0'
+      plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
+      filename = 'stock_dfs/' + stock_ticker_symbol + '_rsi_fig.pickle'
+      img.seek(0)
+      plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
+      if os.path.exists(filename):
+        os.remove(filename)
+      if tickers is not None:
+        with open(filename, 'wb') as f:
+            pl.dump(plot_url, f)
+      plt.close()
     return stock_ticker_symbol
 
 
@@ -317,6 +341,8 @@ def show_buy_sell_points(stock_ticker_symbol):
     filename = 'stock_dfs/' + stock_ticker_symbol + '_buy_sell_points_fig.pickle'
     img.seek(0)
     plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
+    if os.path.exists(filename):
+      os.remove(filename)
     with open(filename, 'wb') as f:
         pl.dump(plot_url, f)
     plt.close()
@@ -370,6 +396,8 @@ def svr_prediction_build_plot(stock_ticker_symbol):
     filename = 'stock_dfs/' + stock_ticker_symbol + '_svr_prediction_build_fig.pickle'
     img.seek(0)
     plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
+    if os.path.exists(filename):
+      os.remove(filename)
     with open(filename, 'wb') as f:
         pl.dump(plot_url, f)
     plt.close()
