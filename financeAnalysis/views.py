@@ -4,6 +4,7 @@ from .backend.StockScreener import movingAverageAnalysis
 from .backend.GL_loop import GL_calculator
 from .backend.plots import *
 from financeAnalysis.finance_form import FinanceForm
+from financeAnalysis.automation.get_stocks import backpopulate_stock_history_2015
 from django.shortcuts import render, get_object_or_404
 import os
 from django.conf import settings
@@ -32,8 +33,11 @@ class StockTickerListView(ListView):
             stocktickers = paginator.page(1)
         except EmptyPage:
             stocktickers = paginator.page(paginator.num_pages)
-
+        except Exception as e:
+            print(e)
+            backpopulate_stock_history_2015()
         context['stocktickers'] = stocktickers
+        backpopulate_stock_history_2015()
         return context
 
 class financeAnalysisDetail():
@@ -53,7 +57,6 @@ class financeAnalysisDetail():
                     stock_ticker_symbol = form.cleaned_data['stock_ticker_symbol']
                     stock_history = StockTickerHistory.get_history_from_symbol(symbol=stock_ticker_symbol)
                     stock_ticker = StockTicker.get_stock_ticker_from_symbol(stock_ticker_symbol)
-                    #write_stock_history_to_database(stock_ticker_symbol, None)
                     stock_pickle = os.path.join(settings.BASE_DIR, 'stock_dfs', stock_ticker_symbol + '.pickle')
                     portfolio_plot = stock_history.plot
                     print("portfolio complete")
@@ -61,16 +64,13 @@ class financeAnalysisDetail():
                     rsi_plot = stock_history.rsi_plot
                     decision_tree_plot = stock_history.decision_tree_plot
                     buy_sell_moving_avg_plot = stock_history.sma_plot
-                    print("Retrieveing Plots complete")
+                    simpleStatsTable = movingAverageAnalysis(stock_ticker_symbol)
+                    args['result'] = stock_history.ml_predictions
+                    args['confidence'] = stock_history.ml_confidence
+                    print("simplestats complete")
                     if os.path.exists(stock_pickle):
-
-                        simpleStatsTable = movingAverageAnalysis(stock_ticker_symbol)
-                        print("simplestats complete")
                         list_green_line_values = GL_calculator(stock_ticker_symbol)
                         print("GL complete")
-                        args['result'] = stock_history.ml_predictions
-                        args['confidence'] = stock_history.ml_confidence
-                        print("machine learning complete")
                         args['simpleStats'] = simpleStatsTable.to_html(classes='table-dark')
                         # args['otherData'] = otherDataTable.to_html(classes='table-dark')
                         args['stock_ticker'] = stock_ticker

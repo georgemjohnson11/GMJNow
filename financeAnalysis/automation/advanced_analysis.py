@@ -53,353 +53,368 @@ def advanced_analysis(stock_ticker_symbol, date):
       print(ex)
 
 def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
-    plt.style.use('fivethirtyeight')
-    img = BytesIO()
-    stocks = getPortfolio(stock_ticker_symbol, date)[-300:]
-    fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
-    ax1.annotate("Last Closing\n Price: $" + str(stocks['symbol__stocktickerhistory__adjusted_close'][-1])[0:6],
-                 (stocks['symbol__stocktickerhistory__updated_on'][-1], stocks['symbol__stocktickerhistory__adjusted_close'][-1]),
-                 xytext=(stocks['symbol__stocktickerhistory__updated_on'][-1] + dt.timedelta(days=4), stocks['symbol__stocktickerhistory__adjusted_close'][-1]), color='#006989', size=10)
-    ax1.set_facecolor('#C1DFF0')
-    plt.rcParams['figure.facecolor'] = '#C1DFF0'
-    smasUsed = [10, 30, 50]  # Choose smas
-    # Calculate moving averages
-    for x in smasUsed:  # This for loop calculates the SMAs for the stated periods and appends to dataframe
-        sma = x
-        stocks['SMA' + str(sma)] = stocks['symbol__stocktickerhistory__adjusted_close'].rolling(window=sma).mean()  # calcaulates sma and creates col
+    try:
+        plt.style.use('fivethirtyeight')
+        img = BytesIO()
+        stocks = getPortfolio(stock_ticker_symbol, date)[-300:]
+        fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
+        ax1.annotate("Last Closing\n Price: $" + str(stocks['symbol__stocktickerhistory__adjusted_close'][-1])[0:6],
+                     (stocks['symbol__stocktickerhistory__updated_on'][-1], stocks['symbol__stocktickerhistory__adjusted_close'][-1]),
+                     xytext=(stocks['symbol__stocktickerhistory__updated_on'][-1] + dt.timedelta(days=4), stocks['symbol__stocktickerhistory__adjusted_close'][-1]), color='#006989', size=10)
+        ax1.set_facecolor('#C1DFF0')
+        plt.rcParams['figure.facecolor'] = '#C1DFF0'
+        smasUsed = [10, 30, 50]  # Choose smas
+        # Calculate moving averages
+        for x in smasUsed:  # This for loop calculates the SMAs for the stated periods and appends to dataframe
+            sma = x
+            stocks['SMA' + str(sma)] = stocks['symbol__stocktickerhistory__adjusted_close'].rolling(window=sma).mean()  # calcaulates sma and creates col
 
-    # calculate Bollinger Bands
-    BBperiod = 15  # choose moving avera
-    stdev = 2
-    stocks['SMA' + str(BBperiod)] = stocks['symbol__stocktickerhistory__adjusted_close'].rolling(
-        window=BBperiod).mean()  # calculates sma and creates a column in the dataframe
-    stocks['STDEV'] = stocks['symbol__stocktickerhistory__adjusted_close'].rolling(
-        window=BBperiod).std()  # calculates standard deviation and creates col
-    stocks['LowerBand'] = stocks['SMA' + str(BBperiod)] - (stdev * stocks['STDEV'])  # calculates lower bollinger band
-    stocks['UpperBand'] = stocks['SMA' + str(BBperiod)] + (stdev * stocks['STDEV'])  # calculates upper band
-    stocks["Date"] = mdates.date2num(stocks['symbol__stocktickerhistory__updated_on'])  # creates a date column stored in number format (for OHCL bars)
+        # calculate Bollinger Bands
+        BBperiod = 15  # choose moving avera
+        stdev = 2
+        stocks['SMA' + str(BBperiod)] = stocks['symbol__stocktickerhistory__adjusted_close'].rolling(
+            window=BBperiod).mean()  # calculates sma and creates a column in the dataframe
+        stocks['STDEV'] = stocks['symbol__stocktickerhistory__adjusted_close'].rolling(
+            window=BBperiod).std()  # calculates standard deviation and creates col
+        stocks['LowerBand'] = stocks['SMA' + str(BBperiod)] - (stdev * stocks['STDEV'])  # calculates lower bollinger band
+        stocks['UpperBand'] = stocks['SMA' + str(BBperiod)] + (stdev * stocks['STDEV'])  # calculates upper band
+        stocks["Date"] = mdates.date2num(stocks['symbol__stocktickerhistory__updated_on'])  # creates a date column stored in number format (for OHCL bars)
 
-    # Calculate 10.4.4 stochastic
-    Period = 10  # Choose stoch period
-    K = 4  # Choose K parameter
-    D = 4  # choose D parameter
+        # Calculate 10.4.4 stochastic
+        Period = 10  # Choose stoch period
+        K = 4  # Choose K parameter
+        D = 4  # choose D parameter
 
-    stocks["RolHigh"] = stocks["High"].rolling(window=Period).max()  # Finds high of period
-    stocks["RolLow"] = stocks["Low"].rolling(window=Period).min()  # finds low of period
-    stocks["stok"] = ((stocks["symbol__stocktickerhistory__adjusted_close"] - stocks["RolLow"]) / (
-            stocks["RolHigh"] - stocks["RolLow"])) * 100  # Finds 10.1 stoch
-    stocks["K"] = stocks["stok"].rolling(window=K).mean()  # Finds 10.4 stoch
-    stocks["D"] = stocks["K"].rolling(window=D).mean()  # Finds 10.4.4 stoch
-    stocks["GD"] = stocks["High"]  # Create GD column to store green dots
+        stocks["RolHigh"] = stocks["High"].rolling(window=Period).max()  # Finds high of period
+        stocks["RolLow"] = stocks["Low"].rolling(window=Period).min()  # finds low of period
+        stocks["stok"] = ((stocks["symbol__stocktickerhistory__adjusted_close"] - stocks["RolLow"]) / (
+                stocks["RolHigh"] - stocks["RolLow"])) * 100  # Finds 10.1 stoch
+        stocks["K"] = stocks["stok"].rolling(window=K).mean()  # Finds 10.4 stoch
+        stocks["D"] = stocks["K"].rolling(window=D).mean()  # Finds 10.4.4 stoch
+        stocks["GD"] = stocks["High"]  # Create GD column to store green dots
 
-    ohlc = []  # Create OHLC array which will store price data for the candlestick chart
+        ohlc = []  # Create OHLC array which will store price data for the candlestick chart
 
-    # Delete extra dates
-    prices = prices.iloc[max(smasUsed):]
+        # Delete extra dates
+        prices = prices.iloc[max(smasUsed):]
 
-    greenDotDate = []  # Stores dates of Green Dots
-    greenDot = []  # Stores Values of Green Dots
-    lastK = 0  # Will store yesterday's fast stoch
-    lastD = 0  # will store yseterdays slow stoch
-    lastLow = 0  # will store yesterdays lower
-    lastClose = 0  # will store yesterdays close
-    lastLowBB = 0  # will store yesterdays lower bband
+        greenDotDate = []  # Stores dates of Green Dots
+        greenDot = []  # Stores Values of Green Dots
+        lastK = 0  # Will store yesterday's fast stoch
+        lastD = 0  # will store yseterdays slow stoch
+        lastLow = 0  # will store yesterdays lower
+        lastClose = 0  # will store yesterdays close
+        lastLowBB = 0  # will store yesterdays lower bband
 
-    # Go through price history to create candlestics and GD+Blue dots
-    for i in stocks['symbol__stocktickerhistory__updated_on']:
-        # append OHLC prices to make the candlestick
-        append_me = stocks["Date"][i], stocks["Open"][i], stocks["High"][i], stocks["Low"][i], stocks["symbol__stocktickerhistory__adjusted_close"][i], \
-                    stocks["Volume"][i]
-        ohlc.append(append_me)
+        # Go through price history to create candlestics and GD+Blue dots
+        for i in stocks['symbol__stocktickerhistory__updated_on']:
+            # append OHLC prices to make the candlestick
+            append_me = stocks["Date"][i], stocks["Open"][i], stocks["High"][i], stocks["Low"][i], stocks["symbol__stocktickerhistory__adjusted_close"][i], \
+                        stocks["Volume"][i]
+            ohlc.append(append_me)
 
-        # Check for Green Dot
-        if stocks['K'][i] > stocks['D'][i] and lastK < lastD and lastK < 60:
-            # plt.Circle((stocks["Date"][i],stocks["High"][i]),1)
-            # plt.bar(stocks["Date"][i],1,1.1,bottom=stocks["High"][i]*1.01,color='g')
-            plt.plot(stocks["Date"][i], stocks["High"][i] + 1, marker="o", ms=4, ls="", color='g')  # plot green dot
+            # Check for Green Dot
+            if stocks['K'][i] > stocks['D'][i] and lastK < lastD and lastK < 60:
+                # plt.Circle((stocks["Date"][i],stocks["High"][i]),1)
+                # plt.bar(stocks["Date"][i],1,1.1,bottom=stocks["High"][i]*1.01,color='g')
+                plt.plot(stocks["Date"][i], stocks["High"][i] + 1, marker="o", ms=4, ls="", color='g')  # plot green dot
 
-            greenDotDate.append(i)  # store green dot date
-            greenDot.append(stocks["High"][i])  # store green dot value
+                greenDotDate.append(i)  # store green dot date
+                greenDot.append(stocks["High"][i])  # store green dot value
 
-        # Check for Lower Bollinger Band Bounce
-        if ((lastLow < lastLowBB) or (stocks['Low'][i] < stocks['LowerBand'][i])) and (
-                stocks['symbol__stocktickerhistory__adjusted_close'][i] > lastClose and stocks['symbol__stocktickerhistory__adjusted_close'][i] > stocks['LowerBand'][i]) and lastK < 60:
-            plt.plot(stocks["Date"][i], stocks["Low"][i] - 1, marker="o", ms=4, ls="", color='b')  # plot blue dot
+            # Check for Lower Bollinger Band Bounce
+            if ((lastLow < lastLowBB) or (stocks['Low'][i] < stocks['LowerBand'][i])) and (
+                    stocks['symbol__stocktickerhistory__adjusted_close'][i] > lastClose and stocks['symbol__stocktickerhistory__adjusted_close'][i] > stocks['LowerBand'][i]) and lastK < 60:
+                plt.plot(stocks["Date"][i], stocks["Low"][i] - 1, marker="o", ms=4, ls="", color='b')  # plot blue dot
 
-        # store values
-        lastK = stocks['K'][i]
-        lastD = stocks['D'][i]
-        lastLow = stocks['Low'][i]
-        lastClose = stocks['symbol__stocktickerhistory__adjusted_close'][i]
-        lastLowBB = stocks['LowerBand'][i]
+            # store values
+            lastK = stocks['K'][i]
+            lastD = stocks['D'][i]
+            lastLow = stocks['Low'][i]
+            lastClose = stocks['symbol__stocktickerhistory__adjusted_close'][i]
+            lastLowBB = stocks['LowerBand'][i]
 
-    # Plot moving averages and BBands
-    for x in smasUsed:  # This for loop calculates the EMAs for te stated periods and appends to dataframe
-        sma = x
-        stocks['SMA' + str(sma)].plot(label='SMA' + str(sma))
-    stocks['UpperBand'].plot(label='Upper Bollinger Band', color='lightgray')
-    stocks['LowerBand'].plot(label='Lower Bollinger Band', color='lightgray')
+        # Plot moving averages and BBands
+        for x in smasUsed:  # This for loop calculates the EMAs for te stated periods and appends to dataframe
+            sma = x
+            stocks['SMA' + str(sma)].plot(label='SMA' + str(sma))
+        stocks['UpperBand'].plot(label='Upper Bollinger Band', color='lightgray')
+        stocks['LowerBand'].plot(label='Lower Bollinger Band', color='lightgray')
 
-    # plot candlesticks
-    candlestick_ohlc(ax1, ohlc, width=.5, colorup='k', colordown='r', alpha=0.75)
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # change x axis back to datestamps
-    ax1.xaxis.set_major_locator(mticker.MaxNLocator(8))  # add more x axis labels
+        # plot candlesticks
+        candlestick_ohlc(ax1, ohlc, width=.5, colorup='k', colordown='r', alpha=0.75)
+        ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # change x axis back to datestamps
+        ax1.xaxis.set_major_locator(mticker.MaxNLocator(8))  # add more x axis labels
 
-    ax1.tick_params(axis='x', rotation=45)  # rotate dates for readability
+        ax1.tick_params(axis='x', rotation=45)  # rotate dates for readability
 
-    # Pivot Points
-    pivots = []  # Stores pivot values
-    dates = []  # Stores Dates corresponding to those pivot values
-    counter = 0  # Will keep track of whether a certain value is a pivot
-    lastPivot = 0  # Will store the last Pivot value
+        # Pivot Points
+        pivots = []  # Stores pivot values
+        dates = []  # Stores Dates corresponding to those pivot values
+        counter = 0  # Will keep track of whether a certain value is a pivot
+        lastPivot = 0  # Will store the last Pivot value
 
-    Range = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # Array used to iterate through stock prices
-    dateRange = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # Array used to iterate through corresponding dates
-    for i in stocks['symbol__stocktickerhistory__updated_on']:  # Iterates through the price history
-        currentMax = max(Range,
-                         default=0)  # Determines the maximum value of the 10 item array, identifying a potential pivot
-        value = round(stocks["High"][i], 2)  # Receives next high value from the dataframe
+        Range = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # Array used to iterate through stock prices
+        dateRange = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # Array used to iterate through corresponding dates
+        for i in stocks['symbol__stocktickerhistory__updated_on']:  # Iterates through the price history
+            currentMax = max(Range,
+                             default=0)  # Determines the maximum value of the 10 item array, identifying a potential pivot
+            value = round(stocks["High"][i], 2)  # Receives next high value from the dataframe
 
-        Range = Range[1:9]  # Cuts Range array to only the most recent 9 values
-        Range.append(value)  # Adds newest high value to the array
-        dateRange = dateRange[1:9]  # Cuts Date array to only the most recent 9 values
-        dateRange.append(i)  # Adds newest date to the array
+            Range = Range[1:9]  # Cuts Range array to only the most recent 9 values
+            Range.append(value)  # Adds newest high value to the array
+            dateRange = dateRange[1:9]  # Cuts Date array to only the most recent 9 values
+            dateRange.append(i)  # Adds newest date to the array
 
-        if currentMax == max(Range, default=0):  # If statement that checks is the max stays the same
-            counter += 1  # if yes add 1 to counter
-        else:
-            counter = 0  # Otherwise new potential pivot so reset the counter
-        if counter == 5:  # checks if we have identified a pivot
-            lastPivot = currentMax  # assigns last pivot to the current max value
-            dateloc = Range.index(lastPivot)  # finds index of the Range array that is that pivot value
-            lastDate = dateRange[dateloc]  # Gets date corresponding to that index
-            pivots.append(currentMax)  # Adds pivot to pivot array
-            dates.append(lastDate)  # Adds pivot date to date array
+            if currentMax == max(Range, default=0):  # If statement that checks is the max stays the same
+                counter += 1  # if yes add 1 to counter
+            else:
+                counter = 0  # Otherwise new potential pivot so reset the counter
+            if counter == 5:  # checks if we have identified a pivot
+                lastPivot = currentMax  # assigns last pivot to the current max value
+                dateloc = Range.index(lastPivot)  # finds index of the Range array that is that pivot value
+                lastDate = dateRange[dateloc]  # Gets date corresponding to that index
+                pivots.append(currentMax)  # Adds pivot to pivot array
+                dates.append(lastDate)  # Adds pivot date to date array
 
-    timeD = dt.timedelta(days=30)  # Sets length of dotted line on chart
+        timeD = dt.timedelta(days=30)  # Sets length of dotted line on chart
 
-    for index in range(len(pivots)):  # Iterates through pivot array
+        for index in range(len(pivots)):  # Iterates through pivot array
 
-        # print(str(pivots[index])+": "+str(dates[index])) #Prints Pivot, Date couple
-        ax1.plot_date([dates[index] - (timeD * .075), dates[index] + timeD],  # Plots horizontal line at pivot value
-                      [6 +
-                       pivots[index], pivots[index]], linestyle="--", linewidth=1, marker=',', color='#006989')
-        ax1.annotate(str(pivots[index]), (mdates.date2num(dates[index]), pivots[index]), xytext=(-10, 7),
-                     textcoords='offset points', fontsize=10, arrowprops=dict(arrowstyle='-|>'), color='#006989')
+            # print(str(pivots[index])+": "+str(dates[index])) #Prints Pivot, Date couple
+            ax1.plot_date([dates[index] - (timeD * .075), dates[index] + timeD],  # Plots horizontal line at pivot value
+                          [6 +
+                           pivots[index], pivots[index]], linestyle="--", linewidth=1, marker=',', color='#006989')
+            ax1.annotate(str(pivots[index]), (mdates.date2num(dates[index]), pivots[index]), xytext=(-10, 7),
+                         textcoords='offset points', fontsize=10, arrowprops=dict(arrowstyle='-|>'), color='#006989')
 
-    ax1.set_xlabel('Date')  # set x axis label
-    ax1.set_ylabel('Price')  # set y axis label
-    ax1.legend(loc='best', prop={'size': 8})
-    ax1.set_title(stock_ticker_symbol + " - Daily", color='#006989')  # set title
-    ax1.set_ylim([stocks["Low"].min(), stocks["High"].max() * 1.05])  # add margins
-    ax1.xaxis.label.set_color('#006989')
-    ax1.yaxis.label.set_color('#006989')
-    ax1.tick_params(axis='x', colors='#006989')
-    ax1.tick_params(axis='y', colors='#006989')
-    COLOR = '#006989'
-    plt.rcParams['axes.facecolor'] = '#C1DFF0'
-    plt.rcParams['text.color'] = COLOR
-    plt.rcParams['axes.labelcolor'] = COLOR
-    plt.rcParams['xtick.color'] = COLOR
-    plt.rcParams['ytick.color'] = COLOR
-    plt.rcParams['grid.color'] = COLOR
-    plt.rcParams['font.family'] = 'serif'
-    plt.rcParams['axes.titlecolor'] = COLOR
-    ax1.set_facecolor('#C1DFF0')
-    plt.rcParams['figure.facecolor'] = '#C1DFF0'
-    plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-    StockTickerHistory.objects.update_or_create(id=stock_ticker_symbol, updated_on=date,
-                                                defaults={'plot': plot_url })
-    plt.close()
-    return stock_ticker_symbol
+        ax1.set_xlabel('Date')  # set x axis label
+        ax1.set_ylabel('Price')  # set y axis label
+        ax1.legend(loc='best', prop={'size': 8})
+        ax1.set_title(stock_ticker_symbol + " - Daily", color='#006989')  # set title
+        ax1.set_ylim([stocks["Low"].min(), stocks["High"].max() * 1.05])  # add margins
+        ax1.xaxis.label.set_color('#006989')
+        ax1.yaxis.label.set_color('#006989')
+        ax1.tick_params(axis='x', colors='#006989')
+        ax1.tick_params(axis='y', colors='#006989')
+        COLOR = '#006989'
+        plt.rcParams['axes.facecolor'] = '#C1DFF0'
+        plt.rcParams['text.color'] = COLOR
+        plt.rcParams['axes.labelcolor'] = COLOR
+        plt.rcParams['xtick.color'] = COLOR
+        plt.rcParams['ytick.color'] = COLOR
+        plt.rcParams['grid.color'] = COLOR
+        plt.rcParams['font.family'] = 'serif'
+        plt.rcParams['axes.titlecolor'] = COLOR
+        ax1.set_facecolor('#C1DFF0')
+        plt.rcParams['figure.facecolor'] = '#C1DFF0'
+        plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
+        img.seek(0)
+        plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
+        StockTickerHistory.objects.update_or_create(id=stock_ticker_symbol, updated_on=date,
+                                                    defaults={'plot': plot_url })
+        plt.close()
+        return plot_url
+    except Exception as ex:
+        print(ex)
 
 
 def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
-    tickers, valid = decisionTreePredictPrice(stock_ticker_symbol)
-    if tickers is not None and valid is not None:
-      img = BytesIO()
-      # Plot the models on a graph to see which has the best fit
-      plt.figure(figsize=(12, 8))
-      fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
-      ax1.annotate("Prediction\n Price: $" + str(valid['Prediction'][-1])[0:8],
-                   (valid.index[-1], valid['Prediction'][-1]),
-                   xytext=(valid.index[-1] + dt.timedelta(days=4), valid['Prediction'][-1]), color='#006989', size=10)
-      plt.style.use('fivethirtyeight')
-      plt.title('Decision Tree Prediction')
-      plt.xlabel('Days')
-      plt.plot(tickers['Close'][-200:])
-      plt.plot(valid[['Close', 'Predictions'][-200:]])
-      plt.legend(['Original', 'Valid', 'Prediction'], loc='best', prop={'size': 8})
-      ax1.set_facecolor('#C1DFF0')
-      plt.rcParams['figure.facecolor'] = '#C1DFF0'
-      plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
-      img.seek(0)
-      plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-      StockTickerHistory.objects.update_or_create(id=stock_ticker_symbol, updated_on=date,
-                                                  defaults={'decision_tree_plot': plot_url})
-      plt.close()
-      return stock_ticker_symbol
+    try:
+        tickers, valid = decisionTreePredictPrice(stock_ticker_symbol)
+        if tickers is not None and valid is not None:
+          img = BytesIO()
+          # Plot the models on a graph to see which has the best fit
+          plt.figure(figsize=(12, 8))
+          fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
+          ax1.annotate("Prediction\n Price: $" + str(valid['Prediction'][-1])[0:8],
+                       (valid.index[-1], valid['Prediction'][-1]),
+                       xytext=(valid.index[-1] + dt.timedelta(days=4), valid['Prediction'][-1]), color='#006989', size=10)
+          plt.style.use('fivethirtyeight')
+          plt.title('Decision Tree Prediction')
+          plt.xlabel('Days')
+          plt.plot(tickers['Close'][-200:])
+          plt.plot(valid[['Close', 'Predictions'][-200:]])
+          plt.legend(['Original', 'Valid', 'Prediction'], loc='best', prop={'size': 8})
+          ax1.set_facecolor('#C1DFF0')
+          plt.rcParams['figure.facecolor'] = '#C1DFF0'
+          plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
+          img.seek(0)
+          plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
+          StockTickerHistory.objects.update_or_create(id=stock_ticker_symbol, updated_on=date,
+                                                      defaults={'decision_tree_plot': plot_url})
+          plt.close()
+          return plot_url
+    except Exception as ex:
+        print(ex)
 
 
 def showRSI(stock_ticker_symbol, date=dt.date.today()):
-    tickers = getPortfolio(stock_ticker_symbol, date)[-500:]
-    # Calculate RSI
-    # Get the difference in daily price
-    if tickers is not None:
-      delta = tickers['symbol__stocktickerhistory__adjusted_close'].diff(1)
-      delta = delta.dropna()
-      up = delta.copy()
-      down = delta.copy()
-      up[up < 0] = 0
-      down[down > 0] = 0
+    try:
+        tickers = getPortfolio(stock_ticker_symbol, date)[-500:]
+        # Calculate RSI
+        # Get the difference in daily price
+        if tickers is not None:
+          delta = tickers['symbol__stocktickerhistory__adjusted_close'].diff(1)
+          delta = delta.dropna()
+          up = delta.copy()
+          down = delta.copy()
+          up[up < 0] = 0
+          down[down > 0] = 0
 
-      period = 14
-      AVG_GAIN = up.rolling(window=period).mean()
-      AVG_LOSS = abs(down.rolling(window=period).mean())
+          period = 14
+          AVG_GAIN = up.rolling(window=period).mean()
+          AVG_LOSS = abs(down.rolling(window=period).mean())
 
-    # Calculate Relative Strength (RS)
-      tickers['RS'] = AVG_GAIN / AVG_LOSS
-      tickers['RSI'] = 100.0 - (100.0 / (1.0 + tickers['RS']))
-    # Calculate RSI
-      img = BytesIO()
+        # Calculate Relative Strength (RS)
+          tickers['RS'] = AVG_GAIN / AVG_LOSS
+          tickers['RSI'] = 100.0 - (100.0 / (1.0 + tickers['RS']))
+        # Calculate RSI
+          img = BytesIO()
 
-      plt.figure(figsize=(12, 8))
-      fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
-      plt.plot(tickers['symbol__stocktickerhistory__updated_on'], tickers['RSI'], label=stock_ticker_symbol, alpha=0.35, color='#5BAAD7')
-      plt.axhline(0, linestyle='--', alpha=0.5, color='grey')
-      plt.axhline(10, linestyle='--', alpha=0.5, color='green')
-      plt.axhline(20, linestyle='--', alpha=0.5, color='orange')
-      plt.axhline(30, linestyle='--', alpha=0.5, color='red')
-      plt.axhline(70, linestyle='--', alpha=0.5, color='red')
-      plt.axhline(80, linestyle='--', alpha=0.5, color='orange')
-      plt.axhline(90, linestyle='--', alpha=0.5, color='green')
-      plt.axhline(100, linestyle='--', alpha=0.5, color='grey')
-      plt.style.use('fivethirtyeight')
-      plt.title(stock_ticker_symbol + ' RSI values and Significant Levels')
-      plt.xlabel(str(tickers['symbol__stocktickerhistory__updated_on'][0]) + ' - ' + str(tickers['symbol__stocktickerhistory__updated_on'][-1]))
-      plt.ylabel('RSI')
-      plt.legend(loc='best', prop={'size': 8})
-      ax1.set_facecolor('#C1DFF0')
-      plt.rcParams['figure.facecolor'] = '#C1DFF0'
-      plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
-      img.seek(0)
-      plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-      StockTickerHistory.objects.update_or_create(id=stock_ticker_symbol, updated_on=date,
-                                                  defaults={'rsi_plot': plot_url})
-      plt.close()
-    return stock_ticker_symbol
+          plt.figure(figsize=(12, 8))
+          fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
+          plt.plot(tickers['symbol__stocktickerhistory__updated_on'], tickers['RSI'], label=stock_ticker_symbol, alpha=0.35, color='#5BAAD7')
+          plt.axhline(0, linestyle='--', alpha=0.5, color='grey')
+          plt.axhline(10, linestyle='--', alpha=0.5, color='green')
+          plt.axhline(20, linestyle='--', alpha=0.5, color='orange')
+          plt.axhline(30, linestyle='--', alpha=0.5, color='red')
+          plt.axhline(70, linestyle='--', alpha=0.5, color='red')
+          plt.axhline(80, linestyle='--', alpha=0.5, color='orange')
+          plt.axhline(90, linestyle='--', alpha=0.5, color='green')
+          plt.axhline(100, linestyle='--', alpha=0.5, color='grey')
+          plt.style.use('fivethirtyeight')
+          plt.title(stock_ticker_symbol + ' RSI values and Significant Levels')
+          plt.xlabel(str(tickers['symbol__stocktickerhistory__updated_on'][0]) + ' - ' + str(tickers['symbol__stocktickerhistory__updated_on'][-1]))
+          plt.ylabel('RSI')
+          plt.legend(loc='best', prop={'size': 8})
+          ax1.set_facecolor('#C1DFF0')
+          plt.rcParams['figure.facecolor'] = '#C1DFF0'
+          plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
+          img.seek(0)
+          plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
+          StockTickerHistory.objects.update_or_create(id=stock_ticker_symbol, updated_on=date,
+                                                      defaults={'rsi_plot': plot_url})
+          plt.close()
+        return plot_url
+    except Exception as ex:
+        print(ex)
 
 
 def show_buy_sell_points(stock_ticker_symbol, date=dt.date.today()):
-    tickers = getPortfolio(stock_ticker_symbol, date)[-600:]
-    signalPriceBuy = []
-    signalPriceSell = []
-    flag = -1
+    try:
+        tickers = getPortfolio(stock_ticker_symbol, date)[-600:]
+        signalPriceBuy = []
+        signalPriceSell = []
+        flag = -1
 
-    smasUsed = [30, 100, 200]  # Choose smas
-    # Calculate moving averages
-    for x in smasUsed:  # This for loop calculates the SMAs for the stated periods and appends to dataframe
-        sma = x
-        tickers['SMA' + str(sma)] = tickers['symbol__stocktickerhistory__adjusted_close'].rolling(window=sma).mean()  # calcaulates sma and creates col
+        smasUsed = [30, 100, 200]  # Choose smas
+        # Calculate moving averages
+        for x in smasUsed:  # This for loop calculates the SMAs for the stated periods and appends to dataframe
+            sma = x
+            tickers['SMA' + str(sma)] = tickers['symbol__stocktickerhistory__adjusted_close'].rolling(window=sma).mean()  # calcaulates sma and creates col
 
-    for i in range(len(tickers['symbol__stocktickerhistory__updated_on'])):
-        if tickers['SMA30'][i] > tickers['SMA100'][i]:
-            if flag != 1:
-                signalPriceBuy.append(tickers['symbol__stocktickerhistory__adjusted_close'][i])
-                signalPriceSell.append(np.nan)
-                flag = 1
+        for i in range(len(tickers['symbol__stocktickerhistory__updated_on'])):
+            if tickers['SMA30'][i] > tickers['SMA100'][i]:
+                if flag != 1:
+                    signalPriceBuy.append(tickers['symbol__stocktickerhistory__adjusted_close'][i])
+                    signalPriceSell.append(np.nan)
+                    flag = 1
+                else:
+                    signalPriceBuy.append(np.nan)
+                    signalPriceSell.append(np.nan)
+            elif tickers['SMA30'][i] < tickers['SMA100'][i]:
+                if flag != 0:
+                    signalPriceSell.append(tickers['symbol__stocktickerhistory__adjusted_close'][i])
+                    signalPriceBuy.append(np.nan)
+                    flag = 0
+                else:
+                    signalPriceSell.append(np.nan)
+                    signalPriceBuy.append(np.nan)
             else:
-                signalPriceBuy.append(np.nan)
-                signalPriceSell.append(np.nan)
-        elif tickers['SMA30'][i] < tickers['SMA100'][i]:
-            if flag != 0:
-                signalPriceSell.append(tickers['symbol__stocktickerhistory__adjusted_close'][i])
-                signalPriceBuy.append(np.nan)
-                flag = 0
-            else:
                 signalPriceSell.append(np.nan)
                 signalPriceBuy.append(np.nan)
-        else:
-            signalPriceSell.append(np.nan)
-            signalPriceBuy.append(np.nan)
 
-    tickers['Buy_Signal_Price'] = signalPriceBuy
-    tickers['Sell_Signal_Price'] = signalPriceSell
+        tickers['Buy_Signal_Price'] = signalPriceBuy
+        tickers['Sell_Signal_Price'] = signalPriceSell
 
-    plt.style.use('fivethirtyeight')
-    img = BytesIO()
-    plt.figure(figsize=(12, 8))
-    fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
-    plt.plot(tickers['symbol__stocktickerhistory__adjusted_close'], label=stock_ticker_symbol, alpha=0.35, color='#2B9720')
-    for x in smasUsed:  # This for loop calculates the EMAs for te stated periods and appends to dataframe
-        sma = x
-        tickers['SMA' + str(sma)].plot(label='SMA' + str(sma), alpha=0.35)
-    plt.scatter(tickers['symbol__stocktickerhistory__updated_on'], tickers['Buy_Signal_Price'], label='BUY', marker='^', s=32, color='#5BAAD7')
-    plt.scatter(tickers['symbol__stocktickerhistory__updated_on'], tickers['Sell_Signal_Price'], label='SELL', marker='v', s=32, color='#006989')
-    plt.title(stock_ticker_symbol + ' symbol__stocktickerhistory__adjusted_close Price History with Buy and Sell Signals')
-    plt.xlabel(str(tickers['symbol__stocktickerhistory__updated_on'][0]) + ' - ' + str(tickers['symbol__stocktickerhistory__updated_on'][-1]))
-    plt.ylabel('Adj. Close Price USD ($)')
-    plt.legend(loc='best', prop={'size': 8})
-    ax1.set_facecolor('#C1DFF0')
-    plt.rcParams['figure.facecolor'] = '#C1DFF0'
-    plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-    StockTickerHistory.objects.update_or_create(id=stock_ticker_symbol, updated_on=date,
-                                                defaults={'sma_plot': plot_url})
-    plt.close()
-    return stock_ticker_symbol
+        plt.style.use('fivethirtyeight')
+        img = BytesIO()
+        plt.figure(figsize=(12, 8))
+        fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
+        plt.plot(tickers['symbol__stocktickerhistory__adjusted_close'], label=stock_ticker_symbol, alpha=0.35, color='#2B9720')
+        for x in smasUsed:  # This for loop calculates the EMAs for te stated periods and appends to dataframe
+            sma = x
+            tickers['SMA' + str(sma)].plot(label='SMA' + str(sma), alpha=0.35)
+        plt.scatter(tickers['symbol__stocktickerhistory__updated_on'], tickers['Buy_Signal_Price'], label='BUY', marker='^', s=32, color='#5BAAD7')
+        plt.scatter(tickers['symbol__stocktickerhistory__updated_on'], tickers['Sell_Signal_Price'], label='SELL', marker='v', s=32, color='#006989')
+        plt.title(stock_ticker_symbol + ' symbol__stocktickerhistory__adjusted_close Price History with Buy and Sell Signals')
+        plt.xlabel(str(tickers['symbol__stocktickerhistory__updated_on'][0]) + ' - ' + str(tickers['symbol__stocktickerhistory__updated_on'][-1]))
+        plt.ylabel('Adj. Close Price USD ($)')
+        plt.legend(loc='best', prop={'size': 8})
+        ax1.set_facecolor('#C1DFF0')
+        plt.rcParams['figure.facecolor'] = '#C1DFF0'
+        plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
+        img.seek(0)
+        plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
+        StockTickerHistory.objects.update_or_create(id=stock_ticker_symbol, updated_on=date,
+                                                    defaults={'sma_plot': plot_url})
+        plt.close()
+        return plot_url
+    except Exception as ex:
+        print(ex)
 
 
 # function to make predictions using 3 different support vector regression models with 3 different kernals
 def svr_prediction_build_plot(stock_ticker_symbol, date=dt.date.today()):
-    now = dt.date.today()
-    DD = dt.timedelta(days=1)
-    tomorrow = [(now + DD).day]
+    try:
+        now = dt.datetime.today()
+        DD = dt.timedelta(days=1)
+        tomorrow = [(now + DD).day]
 
-    tickers = getPortfolio(stock_ticker_symbol, date)
+        tickers = getPortfolio(stock_ticker_symbol, date)
 
-    dates = tickers['symbol__stocktickerhistory__updated_on'][-20:]
-    closing_price = tickers.loc[:, 'symbol__stocktickerhistory__adjusted_close'][-20:]
-    dates = np.reshape(dates, (len(dates), 1))  # convert to 1xn dimension
-    tomorrow = np.reshape(tomorrow, (len(tomorrow), 1))
-    # RBF is the best predictor
-    # Create a 3 support vecotor regresstion model
-    svr_lin = SVR(kernel='linear', C=1e3)
-    svr_poly = SVR(kernel='poly', C=1e3, degree=2)
-    svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)
+        dates = tickers['symbol__stocktickerhistory__updated_on'][-20:]
+        closing_price = tickers.loc[:, 'symbol__stocktickerhistory__adjusted_close'][-20:]
+        dates = np.reshape(dates, (len(dates), 1))  # convert to 1xn dimension
+        tomorrow = np.reshape(tomorrow, (len(tomorrow), 1))
+        # RBF is the best predictor
+        # Create a 3 support vecotor regresstion model
+        svr_lin = SVR(kernel='linear', C=1e3)
+        svr_poly = SVR(kernel='poly', C=1e3, degree=2)
+        svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)
 
-    dates_list = []
-    for i in dates:
-        dates_list.append([i[0].day])
+        dates_list = []
+        for i in dates:
+            dates_list.append([i[0].day])
 
-    # train the models on the dates and prices
-    svr_lin.fit(dates_list, closing_price)
-    svr_poly.fit(dates_list, closing_price)
-    svr_rbf.fit(dates_list, closing_price)
+        # train the models on the dates and prices
+        svr_lin.fit(dates_list, closing_price)
+        svr_poly.fit(dates_list, closing_price)
+        svr_rbf.fit(dates_list, closing_price)
 
-    img = BytesIO()
-    # Plot the models on a graph to see which has the best fit
+        img = BytesIO()
+        # Plot the models on a graph to see which has the best fit
 
-    fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(13, 8))  # Create Plots
-    plt.scatter(dates, closing_price, color='#006989', label=stock_ticker_symbol)
-    plt.plot(dates, svr_lin.predict(dates_list), color='red', label='SVR Linear Model')
-    plt.plot(dates, svr_poly.predict(dates_list), color='#5BAAD7', label='SVR Poly Model')
-    plt.plot(dates, svr_rbf.predict(dates_list), color='#2B9720', label='SVR RBF Model')
-    ax1.set_xlabel('Date')
-    ax1.set_ylabel('Price')
-    ax1.xaxis.label.set_color('#006989')
-    ax1.yaxis.label.set_color('#006989')
-    ax1.set_title('Support Vector Regression', color='#006989')
-    plt.legend(loc='best', prop={'size': 8})
-    ax1.set_facecolor('#C1DFF0')
-    plt.rcParams['figure.facecolor'] = '#C1DFF0'
-    plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-    StockTickerHistory.objects.update_or_create(id=stock_ticker_symbol, updated_on=date,
-                                                defaults={'svr_plot': plot_url})
-    plt.close()
-    return stock_ticker_symbol
+        fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(13, 8))  # Create Plots
+        plt.scatter(dates, closing_price, color='#006989', label=stock_ticker_symbol)
+        plt.plot(dates, svr_lin.predict(dates_list), color='red', label='SVR Linear Model')
+        plt.plot(dates, svr_poly.predict(dates_list), color='#5BAAD7', label='SVR Poly Model')
+        plt.plot(dates, svr_rbf.predict(dates_list), color='#2B9720', label='SVR RBF Model')
+        ax1.set_xlabel('Date')
+        ax1.set_ylabel('Price')
+        ax1.xaxis.label.set_color('#006989')
+        ax1.yaxis.label.set_color('#006989')
+        ax1.set_title('Support Vector Regression', color='#006989')
+        plt.legend(loc='best', prop={'size': 8})
+        ax1.set_facecolor('#C1DFF0')
+        plt.rcParams['figure.facecolor'] = '#C1DFF0'
+        plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
+        img.seek(0)
+        plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
+        StockTickerHistory.objects.update_or_create(id=stock_ticker_symbol, updated_on=date,
+                                                    defaults={'svr_plot': plot_url})
+        plt.close()
+        return plot_url
+    except Exception as ex:
+        print(ex)

@@ -4,17 +4,56 @@ from sklearn.ensemble import VotingClassifier, RandomForestClassifier
 from sklearn.model_selection import cross_validate
 import numpy as np
 import pandas as pd
-import pickle
-import os.path
 from django.conf import settings
+from datetime import datetime
+from financeAnalysis.backend.portfolioManagement import getPortfolio
+from financeAnalysis.models import StockTickerHistory, StockTicker
+import bs4 as bs
+import requests
+import pandas as pd
+import numpy as np
 
 
 #Percent Change based ML algorithm to BUY/Sell
 
+def save_sp500_tickers():
+    wikipediaLink = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
+    resp = requests.get(wikipediaLink)
+    soup = bs.BeautifulSoup(resp.text, 'lxml')
+    table = soup.find('table', {'class': 'wikitable sortable'})
+    tickers = []
+    dates = []
+    start = datetime(2010, 1, 1)
+    for row in table.findAll('tr')[1:]:
+        ticker = row.findAll('td')[0].text
+        date = row.findAll('td')[6].text
+        if(date):
+            StockTicker.objects.update_or_create(id=ticker[:-1],
+                                                 defaults={ 'active': True,
+                                                            'is_currency':False,
+                                                            'ipo_year': datetime.strptime(date[:10], "%Y-%m-%d") })
+        tickers.append(ticker[:-1])
+    tickersDF = pd.DataFrame()
+    tickersDF['Ticker'] = tickers.replace('.','-')
+    return tickersDF
+
+#Market Cap = Value = (number of outstanding Shares * Price)
+
+def compile_data_to_columns():
+    tickers = save_sp500_tickers()
+    main_df = pd.DataFrame()
+    for count, ticker in enumerate(tickers['Ticker']):
+        df = getPortfolio(ticker)
+        df.rename(columns = {'symbol__stocktickerhistory__adjusted_close': ticker}, inplace=True)
+        if main_df.empty:
+            main_df = df
+        else:
+            main_df = main_df.join(df, how='outer')
+    return main_df
 
 def process_data_for_labels(ticker):
     hm_days = 7
-    df = pd.read_csv(os.path.join(settings.BASE_DIR, 'stock_dfs','sp500_adjcloses.csv'), index_col=0)
+    df = compile_data_to_columns()
     tickers = df.columns.values.tolist()
     df.fillna(0, inplace=True)
 
@@ -63,8 +102,8 @@ def extract_feature_sets(ticker):
 
     return X, y, df
 
-def do_ml(ticker):
-    df = pd.read_csv(os.path.join(settings.BASE_DIR,'stock_dfs', 'sp500_adjcloses.csv'), index_col=0)
+def do_ml(ticker, date=datetime.today()):
+    df = compile_data_to_columns()
     if ticker in df.columns:
         X, y, df = extract_feature_sets(ticker)
 
@@ -79,18 +118,8 @@ def do_ml(ticker):
         confidence = clf.score(X_test, y_test)
 
         predictions = clf.predict(X_test)
-        #pickle the predictions to save them for future training
-
-        print('Predicted spread: ', Counter(predictions))
-        print('Predicted confidence: ', confidence)
-
-        filepath = os.path.join(settings.BASE_DIR, "stock_dfs", ticker + "_ml_predictions.pickle")
-        with open(filepath, "wb") as f:
-            pickle.dump(Counter(predictions), f)
-
-        filepath = os.path.join(settings.BASE_DIR, "stock_dfs", ticker + "_ml_confidence.pickle")
-        with open(filepath, "wb") as f:
-            pickle.dump(confidence, f)
+        StockTickerHistory.objects.update_or_create(id=ticker, updated_on=date,
+                                                    defaults={'ml_confidence': confidence, 'ml_predictions': Counter(predictions)})
     else:
         confidence = "N/A"
         predictions = "N/A"

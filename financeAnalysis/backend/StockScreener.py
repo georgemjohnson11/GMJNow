@@ -90,10 +90,10 @@ def movingAverageAnalysis(ticker):
 		smaUsed=[50,150,200]
 		for x in smaUsed:
 			sma=x
-			df["SMA_"+str(sma)]=round(df['Adj Close'].rolling(window=sma).mean(),2)
+			df["SMA_"+str(sma)]=round(df['symbol__stocktickerhistory__adjusted_close'].rolling(window=sma).mean(),2)
 
 		#Get the difference in daily price
-		delta = df['Adj Close'].diff(1)
+		delta = df['symbol__stocktickerhistory__adjusted_close'].diff(1)
 		delta = delta.dropna()
 		up= delta.copy()
 		down = delta.copy()
@@ -109,13 +109,13 @@ def movingAverageAnalysis(ticker):
 		#Calculate RSI
 		df["RSI"] = 100.0 - (100.0 / (1.0 + df["RS"]))
 
-		currentClose=df["Adj Close"][-1]
+		currentClose=df["symbol__stocktickerhistory__adjusted_close"][-1]
 		moving_average_50=df["SMA_50"][-1]
 		moving_average_150=df["SMA_150"][-1]
 		moving_average_200=df["SMA_200"][-1]
 		current_RSI = df["RSI"][-1]
-		low_of_52week=round(min(df["Adj Close"][-260:]), 4)
-		high_of_52week=round(max(df["Adj Close"][-260:]), 4)
+		low_of_52week=round(min(df["symbol__stocktickerhistory__adjusted_close"][-260:]), 4)
+		high_of_52week=round(max(df["symbol__stocktickerhistory__adjusted_close"][-260:]), 4)
 		print(df)
 		try:
 			moving_average_200_20 = df["SMA_200"][-20]

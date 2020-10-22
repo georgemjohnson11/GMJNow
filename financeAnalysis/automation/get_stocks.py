@@ -26,7 +26,7 @@ def write_stock_history_to_database(row, start):
             stock_history = StockTickerHistory(symbol_id=row, close=i[1]['Close'],
                                            low=i[1]['Low'], high=i[1]['High'],
                                            open=i[1]['Open'], volume=i[1]['Volume'],
-                                           adjusted_close=i[1]['symbol__stocktickerhistory__adjusted_close'], updated_on=i[0])
+                                           adjusted_close=i[1]['Adj Close'], updated_on=i[0])
             if stock_history:
                 stock_history.save()
         stockticker = StockTicker.get_stock_ticker_from_symbol(row)

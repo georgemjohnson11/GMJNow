@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import pickle
 from django.conf import settings
 import os.path
+from financeAnalysis.models import StockTicker, StockTickerHistory
 
 
 #Get the stock symbols for the portfolio
@@ -21,8 +22,11 @@ import os.path
 
 #Create a function to get stock prices and portfolio
 
-def getPortfolio(stocks):
-    return pd.read_pickle(os.path.join(settings.BASE_DIR, "stock_dfs", stocks + ".pickle"))
+def getPortfolio(stock_ticker_symbol, date=datetime.today()):
+    df = pd.DataFrame(list(StockTickerHistory.objects.filter(symbol_id=stock_ticker_symbol,
+                                                               updated_on__lte=date)
+                           .values('symbol__stocktickerhistory__updated_on', 'symbol__stocktickerhistory__adjusted_close')))
+    return df
 
 def showPortfolioGraph(stocks, col = 'Adj Close'):
 
@@ -40,7 +44,7 @@ def showPortfolioGraph(stocks, col = 'Adj Close'):
 
 
 #Calculate simple return and other statistics
-def simpleReturns(stocks, col = 'Adj Close'):
+def simpleReturns(stocks, col = 'symbol__stocktickerhistory__adjusted_close'):
     returnsPortfolio = getPortfolio(stocks)[col]
     # calculation is (daily_simple_returns[0] / daily_simple_returns[1]) - 1
     daily_simple_returns = returnsPortfolio.pct_change(1)
@@ -58,7 +62,7 @@ def simpleReturns(stocks, col = 'Adj Close'):
     standardDeviation = daily_simple_returns.std()
     return daily_simple_returns
 
-def showDailySimpleReturns(stocks, col = 'Adj Close'):
+def showDailySimpleReturns(stocks, col = 'symbol__stocktickerhistory__adjusted_close'):
     daily_simple_returns = simpleReturns(stocks, col = col)
     for c in daily_simple_returns.columns.values:
         plt.plot(daily_simple_returns[c], lw=2, label=c)

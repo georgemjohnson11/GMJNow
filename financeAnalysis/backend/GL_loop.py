@@ -4,14 +4,15 @@ import pandas as pd
 import pickle
 from django.conf import settings
 import os.path
+from financeAnalysis.models import StockTicker
 
 def GL_calculator(ticker):
-  tickers = pd.read_pickle(os.path.join(settings.BASE_DIR, "stock_dfs", ticker + ".pickle"))
+  tickers = StockTicker.get_stock_ticker_from_symbol(ticker)
 
-  tickers.drop(tickers[tickers["Volume"]<1000].index, inplace=True)
+  tickers.drop(tickers[tickers["volume"]<1000].index, inplace=True)
 
-  now = dt.datetime.now()
-  dfmonth=tickers.groupby(pd.Grouper(freq="M"))["High"].max()
+  now = dt.date.now()
+  dfmonth=tickers.groupby(pd.Grouper(freq="M"))["high"].max()
 
   allGLVs = []
   allGLVdates = []
