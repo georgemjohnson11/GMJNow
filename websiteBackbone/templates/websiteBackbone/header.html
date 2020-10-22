@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
           integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="/static/style.css">
-    <script data-ad-client="ca-pub-2028725223208251" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+{#    <script data-ad-client="ca-pub-2028725223208251" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>#}
 </head>
 <body>
 <div class="container">
@@ -35,6 +35,13 @@
                 </div>
                 <div class="col-auto px-0">
                     <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0" type="submit">Search</button>
+                </div>
+                <div>
+                    {% if user.is_authenticated %}
+                        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0" type="button"><a href="{% url 'logout' %}">Logout</a></button>
+                    {% else %}
+                        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0" type="button"><a href="{% url 'login' %}">Login</a></button>
+                    {% endif %}
                 </div>
             </form>
         </div>
