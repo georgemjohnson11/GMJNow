@@ -4,8 +4,10 @@ from lxml import html
 import requests
 import json
 import argparse
+from datetime import datetime, timedelta
 from collections import OrderedDict
 from .portfolioManagement import getPortfolio
+from financeAnalysis.models import StockTickerHistory
 
 
 def get_headers():
@@ -68,12 +70,14 @@ def parse(ticker):
 	except requests.exceptions.RequestException as e:  # This is the correct syntax
 		raise SystemExit(e)
 
-def movingAverageAnalysis(ticker):
-
+def buy_signal_indicator(ticker, date=datetime.today()):
 	exportList= pd.DataFrame(columns=["50 Day SMA", "150 Day SMA", "200 Day SMA", "52 Week Low", "52 week High", "RSI", "Buy Signal"])
 	otherDataList = pd.DataFrame(columns=["Earning Per Share", "Price to Earnings Ratio","Forward Dividend & Yield", "Earnings Date", "Last Dividend Date", "1y Target Est", "Day's Range","url"])
 	try:
-		df = getPortfolio(ticker)[-400:]
+		df = getPortfolio(ticker)[-260:]
+		stock_info = StockTickerHistory.objects.get(symbol_id=ticker, updated_on=date)
+		days_ago_20 = date - timedelta(days=20)
+		stock_info_20_days_ago = stock_info = StockTickerHistory.objects.get(symbol_id=ticker, updated_on=days_ago_20)
 		# summary = parse(ticker)
 		# print(summary)
 		# pe = summary["PE Ratio (TTM)"]
@@ -87,42 +91,14 @@ def movingAverageAnalysis(ticker):
 		# if(pe):
 		# 	otherDataList = otherDataList.append({"Earning Per Share": eps, "Price to Earnings Ratio":pe,"Forward Dividend & Yield": pctyield, "Earnings Date": earningsdate, "Last Dividend Date": lastdividenddate, "1y Target Est": one_year_est, "Day's Range": daysRange, "url": reference}, ignore_index=True)
 		# 	print(otherDataList)
-		smaUsed=[50,150,200]
-		for x in smaUsed:
-			sma=x
-			df["SMA_"+str(sma)]=round(df['symbol__stocktickerhistory__adjusted_close'].rolling(window=sma).mean(),2)
 
-		#Get the difference in daily price
-		delta = df['symbol__stocktickerhistory__adjusted_close'].diff(1)
-		delta = delta.dropna()
-		up= delta.copy()
-		down = delta.copy()
-		up[up<0] = 0
-		down[down>0] = 0
-
-		period =14
-		AVG_GAIN = up.rolling(window=period).mean()
-		AVG_LOSS = abs(down.rolling(window=period).mean())
-
-		#Calculate Relative Strength (RS)
-		df["RS"] = AVG_GAIN /AVG_LOSS
-		#Calculate RSI
-		df["RSI"] = 100.0 - (100.0 / (1.0 + df["RS"]))
-
-		currentClose=df["symbol__stocktickerhistory__adjusted_close"][-1]
-		moving_average_50=df["SMA_50"][-1]
-		moving_average_150=df["SMA_150"][-1]
-		moving_average_200=df["SMA_200"][-1]
-		current_RSI = df["RSI"][-1]
-		low_of_52week=round(min(df["symbol__stocktickerhistory__adjusted_close"][-260:]), 4)
-		high_of_52week=round(max(df["symbol__stocktickerhistory__adjusted_close"][-260:]), 4)
-		print(df)
-		try:
-			moving_average_200_20 = df["SMA_200"][-20]
-
-		except Exception:
-			moving_average_200_20=0
-
+		low_of_52week=round(min(df["adjusted_close"][-260:]), 4)
+		high_of_52week=round(max(df["adjusted_close"][-260:]), 4)
+		currentClose = stock_info.adjusted_close
+		moving_average_150 = stock_info.sma_hundred_fifty_day
+		moving_average_200 = stock_info.sma_two_hundred_day
+		moving_average_50 = stock_info.sma_fifty_day
+		current_RSI = stock_info.rsi
 		#Condition 1: Current Price > 150 SMA and > 200 SMA
 		if(currentClose>moving_average_150>moving_average_200):
 			cond_1=True
@@ -134,7 +110,7 @@ def movingAverageAnalysis(ticker):
 		else:
 			cond_2=False
 		#Condition 3: 200 SMA trending up for at least 1 month (ideally 4-5 months)
-		if(moving_average_200>moving_average_200_20):
+		if(moving_average_200>stock_info_20_days_ago.sma_two_hundred_day):
 			cond_3=True
 		else:
 			cond_3=False
@@ -192,10 +168,9 @@ def movingAverageAnalysis(ticker):
 
 
 		if(cond_1 and cond_2 and cond_3 and cond_4 and cond_5 and cond_6 and cond_7 and cond_8):
-			exportList = exportList.append({"50 Day SMA": moving_average_50, "150 Day SMA": moving_average_150, "200 Day SMA": moving_average_200, "52 Week Low": low_of_52week, "52 week High": high_of_52week, "RSI": current_RSI, "Buy Signal": 'Yes'}, ignore_index=True)
-			return exportList
+			stock_info.simple_stat_buy_signal = True
+			stock_info.save()
 	except Exception:
 		print("No data on "+ticker)
-	exportList = exportList.append({"50 Day SMA": moving_average_50, "150 Day SMA": moving_average_150, "200 Day SMA": moving_average_200, "52 Week Low": low_of_52week, "52 week High": high_of_52week, "RSI": current_RSI, "Buy Signal": 'No'}, ignore_index=True)
 	return exportList
 
