@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 from websiteBackbone.models import Profile
 from django.contrib.postgres.fields import ArrayField
 
@@ -44,7 +45,8 @@ class StockTickerHistory(models.Model):
     ml_confidence = models.TextField(blank=True, default="")
     ml_predictions = models.TextField(blank=True, default="")
     simple_stat_buy_signal = models.BooleanField(default=False)
-    green_dot_indicators = models.TextField(blank=True, default="")
+    green_dot_values = ArrayField(models.FloatField(default=0), null=True, blank=True)
+    green_dot_dates = ArrayField(models.DateField(), null=True, blank=True)
     decision_tree_plot = models.TextField(blank=True, default="")
     rsi_plot = models.TextField(blank=True, default="")
     sma_plot = models.TextField(blank=True, default="")
@@ -52,7 +54,13 @@ class StockTickerHistory(models.Model):
 
     def get_history_from_symbol(symbol):
         try:
-            return StockTickerHistory.objects.get(symbol_id=symbol)
+            return StockTickerHistory.objects.filter(symbol_id=symbol).last()
+        except Exception as e:
+            return print(e)
+
+    def get_todays_history_from_symbol(symbol):
+        try:
+            return StockTickerHistory.objects.filter(symbol_id=symbol).filter(updated_on__lte=datetime.today()).last()
         except Exception as e:
             return print(e)
 

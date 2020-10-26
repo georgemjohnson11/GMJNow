@@ -28,7 +28,7 @@
             bands
             automatically widen when volatility increases and contract when volatility decreases.
         </p>
-        <h3>Simple Stats: </h3>
+        <h3>Simple Stat Buy Signal: </h3>
         {{ simpleStats|safe }}
         <br/>
         <p> Screening stocks can help decide quickly using particular indicators
@@ -60,7 +60,9 @@
             Optimal buying time is typically within 1-3 days of a green dot appearing.This
             looks for the 10.4 stochastic crosses above 4 day SMA after being oversold.
             <a target=_blank href=https://wishingwealthblog.com/2018/03/green-dot-strategy-defined/> More Info</a></p>
-        {{ green_line_values|safe }}
+        {% for i,j in green_dot_values %}
+        <div>GreenDot Buy Price: {{ j|safe }} Date: {{ i|safe }}</div>
+        {% endfor %}
         <br/>
         <h3>Simple Moving Averages (SMAs): </h3>
         <p><img class="img-fluid" src="data:image/png;base64,{{ viewBuySellMA }}"/></p>

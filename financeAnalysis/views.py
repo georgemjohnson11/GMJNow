@@ -52,21 +52,18 @@ class financeAnalysisDetail():
                 form = FinanceForm(request.POST)
                 if form.is_valid():
                     stock_ticker_symbol = form.cleaned_data['stock_ticker_symbol']
-                    stock_history = StockTickerHistory.get_history_from_symbol(symbol=stock_ticker_symbol)
+                    stock_history = StockTickerHistory.get_todays_history_from_symbol(symbol=stock_ticker_symbol)
                     stock_ticker = StockTicker.get_stock_ticker_from_symbol(stock_ticker_symbol)
                     portfolio_plot = stock_history.plot
-                    print("portfolio complete")
                     svr_prediction_plot = stock_history.svr_plot
                     rsi_plot = stock_history.rsi_plot
                     decision_tree_plot = stock_history.decision_tree_plot
                     buy_sell_moving_avg_plot = stock_history.sma_plot
-                    simpleStatsTable = stock_history.simple_stat_buy_signal
                     args['result'] = stock_history.ml_predictions
                     args['confidence'] = stock_history.ml_confidence
-                    print("simplestats complete")
-                    list_green_line_values = GL_calculator(stock_ticker_symbol)
-                    print("GL complete")
-                    #args['simpleStats'] = simpleStatsTable.to_html(classes='table-dark')
+                    green_dot_dates = stock_history.green_dot_dates
+                    green_dot_values = stock_history.green_dot_values
+                    args['simpleStats'] = stock_history.simple_stat_buy_signal
                     # args['otherData'] = otherDataTable.to_html(classes='table-dark')
                     args['stock_ticker'] = stock_ticker
                     args['viewSVR'] = svr_prediction_plot
@@ -74,7 +71,7 @@ class financeAnalysisDetail():
                     args['viewdecisionTree'] = decision_tree_plot
                     args['view_portfolio_plot'] = portfolio_plot
                     args['viewBuySellMA'] = buy_sell_moving_avg_plot
-                    args['green_line_values'] = list_green_line_values.to_html(classes='table-dark')
+                    args['green_dot_values'] = zip(green_dot_dates,green_dot_values)
                     print("Processing complete")
                     return render(request, 'financeHome.html', args)
             except Exception as e:

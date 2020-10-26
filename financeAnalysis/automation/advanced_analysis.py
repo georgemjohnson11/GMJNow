@@ -12,50 +12,39 @@ from io import BytesIO
 from financeAnalysis.models import StockTickerHistory, StockTicker
 from financeAnalysis.backend.decisionTree import decisionTreePredictPrice
 from financeAnalysis.backend.portfolioManagement import getPortfolio, getPortfolioDateTime, getPortfolioAdvanced
-from financeAnalysis.backend.MLBuySell import do_ml
 import base64
 
-def advanced_analysis(stock_ticker_symbol, date):
+def advanced_analysis(stock_ticker_symbol, date=dt.date.today()):
     now = dt.date.today()
     try:
-      show_buy_sell_points(stock_ticker_symbol, date)
+        print('starting buy sell points')
+        show_buy_sell_points(stock_ticker_symbol, date)
     except Exception as ex:
-      if not StockTickerHistory.objects.filter(symbol_id=stock_ticker_symbol, updated_on=date).first():
-            StockTicker.objects.update_or_create(id=stock_ticker_symbol, defaults={ 'updated_on': now })
       print(ex)
     try:
-      showRSI(stock_ticker_symbol, date)
+        print('starting rsi')
+        showRSI(stock_ticker_symbol, date)
     except Exception as ex:
-      if not StockTickerHistory.objects.filter(symbol_id=stock_ticker_symbol, updated_on=date).first():
-            StockTicker.objects.update_or_create(id=stock_ticker_symbol, defaults={ 'updated_on': now })
       print(ex)
     try:
-      svr_prediction_build_plot(stock_ticker_symbol, date)
+        print('svr prediction')
+        svr_prediction_build_plot(stock_ticker_symbol, date)
     except Exception as ex:
-      if not StockTickerHistory.objects.filter(symbol_id=stock_ticker_symbol, updated_on=date).first():
-            StockTicker.objects.update_or_create(id=stock_ticker_symbol, defaults={ 'updated_on': now })
       print(ex)
     try:
-      ticker_overview(stock_ticker_symbol, date)
+        print('starting ticker overview')
+        ticker_overview(stock_ticker_symbol, date)
     except Exception as ex:
-        if not StockTickerHistory.objects.filter(symbol_id=stock_ticker_symbol, updated_on=date).first():
-            StockTicker.objects.update_or_create(id=stock_ticker_symbol, defaults={'updated_on': now})
         print(ex)
     try:
-      decisionTreePrediction(stock_ticker_symbol, date)
+        print('starting decision tree prediction')
+        decisionTreePrediction(stock_ticker_symbol, date)
     except Exception as ex:
-      if not StockTickerHistory.objects.filter(symbol_id=stock_ticker_symbol, updated_on=date).first():
-            StockTicker.objects.update_or_create(id=stock_ticker_symbol, defaults={ 'updated_on': now })
-      print(ex)
-    try:
-      do_ml(stock_ticker_symbol, date)
-    except Exception as ex:
-      if not StockTickerHistory.objects.filter(symbol_id=stock_ticker_symbol, updated_on=date).first():
-            StockTicker.objects.update_or_create(id=stock_ticker_symbol, defaults={ 'updated_on': now })
       print(ex)
 
 def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
     try:
+        stocks = pd.DataFrame()
         plt.style.use('fivethirtyeight')
         img = BytesIO()
         stocks = getPortfolioAdvanced(stock_ticker_symbol, date)[-300:]
@@ -109,7 +98,7 @@ def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
         lastLowBB = 0  # will store yesterdays lower bband
 
         # Go through price history to create candlestics and GD+Blue dots
-        for i in range(len(stocks.index)):
+        for i in range(len(stocks['Date'])):
             # append OHLC prices to make the candlestick
             append_me = stocks['Date'][i], stocks["open"][i], stocks["high"][i], stocks["low"][i], stocks["adjusted_close"][i], stocks["volume"][i]
             ohlc.append(append_me)
@@ -120,13 +109,13 @@ def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
                 # plt.bar(stocks["Date"][i],1,1.1,bottom=stocks["High"][i]*1.01,color='g')
                 plt.plot(stocks["Date"][i], stocks["high"][i] + 1, marker="o", ms=4, ls="", color='g')  # plot green dot
 
-                greenDotDate.append(stocks["Date"][i])  # store green dot date
+                greenDotDate.append(stocks.index[i])  # store green dot date
                 greenDot.append(stocks["high"][i])  # store green dot value
 
             # Check for Lower Bollinger Band Bounce
             if ((lastLow < lastLowBB) or (stocks['low'][i] < stocks['LowerBand'][i])) and (
                     stocks['adjusted_close'][i] > lastClose and stocks['adjusted_close'][i] > stocks['LowerBand'][i]) and lastK < 60:
-                plt.plot(stocks.index[i], stocks["low"][i] - 1, marker="o", ms=4, ls="", color='b')  # plot blue dot
+                plt.plot(stocks['Date'][i], stocks["low"][i] - 1, marker="o", ms=4, ls="", color='b')  # plot blue dot
 
             # store values
             lastK = stocks['K'][i]
@@ -213,14 +202,19 @@ def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
         plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
         plt.close()
         img.close()
-        StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=date,
-                                                    defaults={'sma_fifty_day': stocks['SMA50'][-1], 'plot': plot_url })
+        StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=stocks.index[-1],
+                                                    defaults={'sma_fifty_day': stocks['SMA50'][-1],
+                                                              'green_dot_dates': greenDotDate,
+                                                              'green_dot_values': greenDot,
+                                                              'plot': plot_url })
         return plot_url
     except Exception as ex:
         print(ex)
 
 def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
     try:
+        tickers = pd.DataFrame()
+        valid = pd.DataFrame()
         tickers, valid = decisionTreePredictPrice(stock_ticker_symbol)
         if tickers is not None and valid is not None:
           img = BytesIO()
@@ -241,9 +235,10 @@ def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
           plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
           img.seek(0)
           plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-          StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=date,
+          StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=valid.index[-1],
                                                       defaults={'decision_tree_plot': plot_url})
           plt.close()
+          img.close()
           return plot_url
     except Exception as ex:
         print(ex)
@@ -251,6 +246,7 @@ def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
 
 def showRSI(stock_ticker_symbol, date=dt.date.today()):
     try:
+        tickers = pd.DataFrame()
         tickers = getPortfolio(stock_ticker_symbol, date)[-500:]
         # Calculate RSI
         # Get the difference in daily price
@@ -275,7 +271,7 @@ def showRSI(stock_ticker_symbol, date=dt.date.today()):
 
           plt.figure(figsize=(12, 8))
           fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
-          plt.plot(tickers.index, tickers['RSI'], label=stock_ticker_symbol, alpha=0.35, color='#5BAAD7')
+          plt.plot(mdates.date2num(tickers.index), tickers['RSI'], label=stock_ticker_symbol, alpha=0.35, color='#5BAAD7')
           plt.axhline(0, linestyle='--', alpha=0.5, color='grey')
           plt.axhline(10, linestyle='--', alpha=0.5, color='green')
           plt.axhline(20, linestyle='--', alpha=0.5, color='orange')
@@ -295,9 +291,10 @@ def showRSI(stock_ticker_symbol, date=dt.date.today()):
           plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
           img.seek(0)
           plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-          StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=date,
+          StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=tickers.index[-1],
                                                       defaults={'rsi_plot': plot_url, 'rsi': tickers['RSI'][-1]})
           plt.close()
+          img.close()
         return plot_url
     except Exception as ex:
         print(ex)
@@ -305,6 +302,7 @@ def showRSI(stock_ticker_symbol, date=dt.date.today()):
 #Work on adding datetime values as NaT
 def show_buy_sell_points(stock_ticker_symbol, date=dt.date.today()):
     try:
+        tickers = pd.DataFrame()
         tickers = getPortfolioDateTime(stock_ticker_symbol, date)[-600:]
         signalPriceBuy = []
         signalPriceSell = []
@@ -359,12 +357,13 @@ def show_buy_sell_points(stock_ticker_symbol, date=dt.date.today()):
         plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
         img.seek(0)
         plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-        StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=date,
+        StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=tickers.index[-1],
                                                     defaults={'sma_plot': plot_url,
                                                               'sma_thirty_day': tickers['SMA30'][-1],
                                                               'sma_hundred_fifty_day': tickers['SMA30'][-1],
                                                               'sma_two_hundred_day': tickers['SMA30'][-1],})
         plt.close()
+        img.close()
         return plot_url
     except Exception as ex:
         print(ex)
@@ -373,6 +372,7 @@ def show_buy_sell_points(stock_ticker_symbol, date=dt.date.today()):
 # function to make predictions using 3 different support vector regression models with 3 different kernals
 def svr_prediction_build_plot(stock_ticker_symbol, date=dt.date.today()):
     try:
+        tickers = pd.DataFrame()
         now = dt.datetime.today()
         DD = dt.timedelta(days=1)
         tomorrow = [(now + DD).day]
@@ -417,9 +417,10 @@ def svr_prediction_build_plot(stock_ticker_symbol, date=dt.date.today()):
         plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
         img.seek(0)
         plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-        StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=date,
+        StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=tickers.index[-1],
                                                     defaults={'svr_plot': plot_url})
         plt.close()
+        img.close()
         return plot_url
     except Exception as ex:
         print(ex)

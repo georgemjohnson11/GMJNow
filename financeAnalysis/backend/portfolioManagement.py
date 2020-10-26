@@ -39,13 +39,24 @@ def getPortfolioAdvanced(stock_ticker_symbol, date=date.today()):
                            .values('updated_on', 'high', 'low', 'open', 'volume', 'adjusted_close'))).set_index('updated_on')
     return df
 
+def getPortfolio_ml(stock_ticker_symbol, date=date.today()):
+    df = pd.DataFrame(list(StockTickerHistory.objects
+                           .filter(symbol_id = stock_ticker_symbol)
+                           .filter(updated_on__lte=date)
+                           .annotate(updated_date=TruncDate('updated_on'))
+                           .values('updated_date', 'adjusted_close')))
+    if 'updated_date' in df.columns:
+        df.set_index('updated_date')
+    return df
+
 def getPortfolioDateTime(stock_ticker_symbol, date=date.today()):
     df = pd.DataFrame(list(StockTickerHistory.objects
                            .filter(symbol_id = stock_ticker_symbol)
                            .filter(updated_on__lte=date)
                            .values('updated_on', 'adjusted_close')))
-    df['updated_on'] = pd.to_datetime(df['updated_on'])
-    df.set_index('updated_on', inplace=True)
+    if 'updated_on' in df.columns:
+        df['updated_on'] = pd.to_datetime(df['updated_on'])
+        df.set_index('updated_on', inplace=True)
     return df
 
 def showPortfolioGraph(stocks, col = 'Adj Close'):
