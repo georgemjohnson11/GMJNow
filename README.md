@@ -49,6 +49,7 @@ Docker command:
 1. Use mixins to simplify Setup
 6. Change static file asset hosting
 5. Separate AI from basic information
+9. Utilize Blob with file check instead of pickle or base64 database store
 8. Save Model using [Mongo DB](https://django-mongodb-engine.readthedocs.io/en/latest/tutorial.html)
 
 

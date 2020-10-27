@@ -200,7 +200,7 @@ def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
         plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
         img.seek(0)
         plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-        plt.close()
+        plt.close('all')
         img.close()
         StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=stocks.index[-1],
                                                     defaults={'sma_fifty_day': stocks['SMA50'][-1],
@@ -215,7 +215,7 @@ def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
     try:
         tickers = pd.DataFrame()
         valid = pd.DataFrame()
-        tickers, valid = decisionTreePredictPrice(stock_ticker_symbol)
+        valid = decisionTreePredictPrice(stock_ticker_symbol)
         if tickers is not None and valid is not None:
           img = BytesIO()
           # Plot the models on a graph to see which has the best fit
@@ -227,6 +227,7 @@ def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
           plt.style.use('fivethirtyeight')
           plt.title('Decision Tree Prediction')
           plt.xlabel('Days')
+          tickers = getPortfolio(stock_ticker_symbol)
           plt.plot(tickers['adjusted_close'][-200:])
           plt.plot(valid[['adjusted_close', 'Predictions'][-200:]])
           plt.legend(['Original', 'Valid', 'Prediction'], loc='best', prop={'size': 8})
@@ -235,9 +236,9 @@ def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
           plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
           img.seek(0)
           plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-          StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=valid.index[-1],
+          StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=date,
                                                       defaults={'decision_tree_plot': plot_url})
-          plt.close()
+          plt.close('all')
           img.close()
           return plot_url
     except Exception as ex:
@@ -293,7 +294,7 @@ def showRSI(stock_ticker_symbol, date=dt.date.today()):
           plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
           StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=tickers.index[-1],
                                                       defaults={'rsi_plot': plot_url, 'rsi': tickers['RSI'][-1]})
-          plt.close()
+          plt.close('all')
           img.close()
         return plot_url
     except Exception as ex:
@@ -362,7 +363,7 @@ def show_buy_sell_points(stock_ticker_symbol, date=dt.date.today()):
                                                               'sma_thirty_day': tickers['SMA30'][-1],
                                                               'sma_hundred_fifty_day': tickers['SMA30'][-1],
                                                               'sma_two_hundred_day': tickers['SMA30'][-1],})
-        plt.close()
+        plt.close('all')
         img.close()
         return plot_url
     except Exception as ex:
@@ -419,7 +420,7 @@ def svr_prediction_build_plot(stock_ticker_symbol, date=dt.date.today()):
         plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
         StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=tickers.index[-1],
                                                     defaults={'svr_plot': plot_url})
-        plt.close()
+        plt.close('all')
         img.close()
         return plot_url
     except Exception as ex:

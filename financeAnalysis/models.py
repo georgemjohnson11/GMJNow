@@ -20,7 +20,7 @@ class StockTicker(models.Model):
 
     def get_stock_ticker_from_symbol(symbol):
         try:
-            return StockTicker.objects.get(id=symbol)
+            return StockTicker.objects.filter(id=symbol).last()
         except Exception as e:
             return print(e)
 
@@ -60,7 +60,7 @@ class StockTickerHistory(models.Model):
 
     def get_todays_history_from_symbol(symbol):
         try:
-            return StockTickerHistory.objects.filter(symbol_id=symbol).filter(updated_on__lte=datetime.today()).last()
+            return StockTickerHistory.objects.filter(symbol_id=symbol).filter(updated_on__range=[datetime(2020,10,22),datetime.utcnow()]).last()
         except Exception as e:
             return print(e)
 

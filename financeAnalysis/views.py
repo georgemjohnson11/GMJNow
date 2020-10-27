@@ -1,7 +1,7 @@
 from .backend.GL_loop import GL_calculator
 from .backend.plots import *
 from financeAnalysis.finance_form import FinanceForm
-from financeAnalysis.automation.get_stocks import backpopulate_stock_history_2015
+from financeAnalysis.automation.get_stocks import populate_todays_history
 from django.shortcuts import render, get_object_or_404
 import os
 from django.conf import settings
@@ -32,9 +32,9 @@ class StockTickerListView(ListView):
             stocktickers = paginator.page(paginator.num_pages)
         except Exception as e:
             print(e)
-            backpopulate_stock_history_2015()
+            populate_todays_history()
         context['stocktickers'] = stocktickers
-        backpopulate_stock_history_2015()
+        populate_todays_history()
         return context
 
 class financeAnalysisDetail():

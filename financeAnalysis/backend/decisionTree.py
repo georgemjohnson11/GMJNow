@@ -49,6 +49,6 @@ def decisionTreePredictPrice(ticker):
 
     valid = tickers[X.shape[0]:]
     valid['Predictions'] = predictions
-    return tickers, valid
+    return valid
 
 #plt.show()

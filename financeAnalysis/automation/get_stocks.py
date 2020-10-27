@@ -11,15 +11,8 @@ from financeAnalysis.backend.MLBuySell import do_ml
 
 def populate_todays_history(date=dt.datetime(2020,10,22)):
     for ticker in StockTicker.objects.filter(updated_time__lte=date):
-        if StockTickerHistory.get_todays_history_from_symbol(ticker.id):
+        if not StockTickerHistory.get_todays_history_from_symbol(ticker.id):
             write_stock_history_to_database(ticker.id, date)
-            advanced_analysis(ticker.id, date)
-            buy_signal_indicator(ticker.id, date)
-            print('starting last sell update')
-            history = StockTickerHistory.get_todays_history_from_symbol(ticker.id)
-            if history:
-                ticker.last_sale = history.adjusted_close
-                ticker.save()
     do_ml()
 
 def backpopulate_stock_history_2015():
@@ -34,24 +27,28 @@ def backpopulate_stock_history_2015():
 def write_stock_history_to_database(row, start):
     end = dt.datetime(2020,10,23)
     if start is None:
-        start=end - timedelta(days=5)
+        start=dt.datetime(2020,10,22)
     print('Fetching {}  on {}'.format(row, start))
     try:
         df = web.get_data_yahoo(row.replace('.','-'), start=start, end=end)
         df.reset_index(inplace=True)
         df.set_index("Date", inplace=True)
         for i in df.iterrows():
-            if i[1]['High']:
-                StockTickerHistory.objects.update_or_create(symbol_id=row, close=i[1]['Close'],
-                                               low=i[1]['Low'], high=i[1]['High'],
-                                               open=i[1]['Open'], volume=i[1]['Volume'],
-                                               adjusted_close=i[1]['Adj Close'], updated_on=i[0])
-        stockticker = StockTicker.get_stock_ticker_from_symbol(row)
-        if stockticker:
-            stockticker.updated_time = dt.datetime.now()
-            stockticker.save()
+            StockTickerHistory.objects.update_or_create(symbol_id=row, close=i[1]['Close'],
+                                           low=i[1]['Low'], high=i[1]['High'],
+                                           open=i[1]['Open'], volume=i[1]['Volume'],
+                                           adjusted_close=i[1]['Adj Close'], updated_on=i[0])
+        advanced_analysis(row, start)
+        StockTicker.objects.filter(id=row).update(updated_time=start)
+        advanced_analysis(row, end)
+        StockTicker.objects.filter(id=row).update(updated_time=end)
+        buy_signal_indicator(row, start)
+        buy_signal_indicator(row, end)
+        print('starting last sell update')
     except RemoteDataError:
+        StockTicker.objects.filter(id=row).update(updated_time=start)
         print('remote error ' + row)
     except KeyError:
+        StockTicker.objects.filter(id=row).update(updated_time=start)
         print('key error ' + row)
 
