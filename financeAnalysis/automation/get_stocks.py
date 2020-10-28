@@ -9,10 +9,9 @@ from .advanced_analysis import advanced_analysis
 from financeAnalysis.backend.StockScreener import buy_signal_indicator
 from financeAnalysis.backend.MLBuySell import do_ml
 
-def populate_todays_history(date=dt.datetime(2020,10,22)):
+def populate_todays_history(date=dt.datetime(2020,10,26)):
     for ticker in StockTicker.objects.filter(updated_time__lte=date):
-        if not StockTickerHistory.get_todays_history_from_symbol(ticker.id):
-            write_stock_history_to_database(ticker.id, date)
+        write_stock_history_to_database(ticker.id, date)
     do_ml()
 
 def backpopulate_stock_history_2015():
@@ -25,9 +24,9 @@ def backpopulate_stock_history_2015():
 
 
 def write_stock_history_to_database(row, start):
-    end = dt.datetime(2020,10,23)
+    end = dt.datetime(2020,10,27)
     if start is None:
-        start=dt.datetime(2020,10,22)
+        start=dt.datetime(2020,10,26)
     print('Fetching {}  on {}'.format(row, start))
     try:
         df = web.get_data_yahoo(row.replace('.','-'), start=start, end=end)

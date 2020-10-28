@@ -4,6 +4,10 @@ from django.core.mail import EmailMessage
 from django.contrib import messages
 from django.http import HttpResponse, BadHeaderError, HttpResponseRedirect
 from .contactform import ContactForm, UserForm, ProfileForm
+from django.contrib.auth import login
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from websiteBackbone.forms import CustomUserCreationForm
 
 
 def update_profile(request):
@@ -20,10 +24,22 @@ def update_profile(request):
     else:
         user_form = UserForm(instance=request.user)
         profile_form = ProfileForm(instance=request.user.profile)
-    return render(request, 'websiteBackbone/templates/registration/edit_user_profile.html', {
-        'user_form': user_form,
-        'profile_form': profile_form
-    })
+    return render(request, 'websiteBackbone/templates/registration/edit_user_profile.html',
+                  {'user_form': user_form, 'profile_form': profile_form })
+
+
+def register(request):
+     if request.method == "GET":
+         return render(
+             request, "users/register.html",
+             {"form": CustomUserCreationForm}
+         )
+     elif request.method == "POST":
+         form = CustomUserCreationForm(request.POST)
+         if form.is_valid():
+             user = form.save()
+             login(request, user)
+             return redirect(reverse("index"))
 
 def about(request):
     return render(request, './websiteBackbone/about.html')

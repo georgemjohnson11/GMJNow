@@ -16,11 +16,12 @@ Including another URLconf
 from django.urls import path, include
 from . import views
 
+
 urlpatterns = [
     path(r'contact/', views.contact, name='contact'),
-    path(r'registration/', include("django.contrib.auth.urls")),
     path(r'submission/', views.submission, name='submission'),
     path(r'about/', views.about, name='about'),
+    path(r'register/', views.register, name="register"),
     path(r'privacypolicy/', views.privacypolicy, name='privacypolicy'),
     path(r'termsconditions/', views.termsconditions, name='termsconditions'),
     path(r'', views.index, name='index'),

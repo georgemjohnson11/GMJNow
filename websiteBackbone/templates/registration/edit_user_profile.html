@@ -1,0 +1,17 @@
+{% extends "websiteBackbone/header.html" %}
+{% block content %}
+<h2>Change password</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Change">
+</form>
+
+<form method="post">
+  {% csrf_token %}
+  {{ user_form.as_p }}
+  {{ profile_form.as_p }}
+  <button type="submit">Save changes</button>
+</form>
+{% endblock %}

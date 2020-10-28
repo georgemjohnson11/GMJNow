@@ -41,7 +41,6 @@ Docker command:
    
 
 ##TO DO   
-7. User Profile [Management](https://realpython.com/django-user-management/#create-a-dashboard-view)
 2. Add Testing
 7. Use Airflow instead of cron jobs to schedule tasks
 3. Start [React](https://bezkoder.com/django-react-axios-rest-framework/) frontend - make more modular
@@ -51,6 +50,7 @@ Docker command:
 5. Separate AI from basic information
 9. Utilize Blob with file check instead of pickle or base64 database store
 8. Save Model using [Mongo DB](https://django-mongodb-engine.readthedocs.io/en/latest/tutorial.html)
+7. Social Auth User Profile [Management](https://realpython.com/django-user-management/#create-a-dashboard-view)
 
 
 ## License

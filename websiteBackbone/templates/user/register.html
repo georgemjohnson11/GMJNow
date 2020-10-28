@@ -1,0 +1,22 @@
+{% extends "websiteBackbone/header.html" %}
+{% block content %}
+<style>
+    label, input {
+        display: block;
+    }
+    span.helptext {
+        display: none;
+    }
+</style>
+
+<h2>Register</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{form}}
+    <input type="submit" value="Register">
+</form>
+
+<a href="{% url 'index' %}">Back to dashboard</a>
+<a href="{% url 'login' %}">Back to login</a>
+{% endblock %}

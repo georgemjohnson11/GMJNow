@@ -18,13 +18,13 @@
 <body>
 <div class="container">
     <nav class="navbar navbar-expand-md fixed-top navbar-light" style="background-color: #044962;">
-        <a class="navbar-brand" href="../#"><img src="{% static 'img/navbar_logo_150x85.jpg' %}"></a>
+        <a class="navbar-brand" href="{% url 'index %}"><img src="{% static 'img/navbar_logo_150x85.jpg' %}"></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
-            <form class="row text-center" style="width: 75%;" method="post" action="./../finance/">
+            <form class="row text-center" style="width: 75%;" method="post" action="{% url 'financeAnalysis:analysis_page' %}">
                 {% csrf_token %}
                 <div class="col pr-1">
                     <input class="form-control searchFieldText" type="text" maxlength="7" label="stock_ticker_symbol"
@@ -57,12 +57,12 @@
 
 <footer class="footer bg-dark">
     <div class="container row">
-        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="./../posts/">Blog</a></button>
+        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="{% url 'posts-view' %}">Blog</a></button>
         <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="https://mailchi.mp/0aec99988c6b/gmjnow-finance">Subscribe</a></button>
-        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="./../termsconditions/">Terms and Conditions</a></button>
-        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="./../contact/">Contact Us</a></button>
-        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="./../privacypolicy/">Privacy Policy</a></button>
-        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="./../about/">About</a></button>
+        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="{% url 'termsconditions' %}">Terms and Conditions</a></button>
+        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="{% url 'contact' %}">Contact Us</a></button>
+        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="{% url 'privacypolicy' %}">Privacy Policy</a></button>
+        <button class="btn btn-outline-success custom-btn-class my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4"><a href="{% url 'about' %}">About</a></button>
       </div>
       <div>
         <span class="col col-sm-6 col-md-6 col-lg-6"> GMJNOW LLC © 2020</span>

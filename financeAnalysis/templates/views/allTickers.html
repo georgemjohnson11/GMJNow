@@ -1,0 +1,57 @@
+{% extends "websiteBackbone/header.html" %}
+
+{% block content %}
+    <div class="container jumbotron">
+            <container>
+                <div class="card-deck mb-3 text-justify" >
+                            <table class="table">
+                              <thead>
+                                <tr>
+                                  <th scope="col">Symbol</th>
+                                  <th scope="col">Name</th>
+                                  <th scope="col">Industry</th>
+                                  <th scope="col">Sector</th>
+                                  <th scope="col">Exchange Market</th>
+                                  <th scope="col">Last Sale</th>
+                                  <th scope="col">Updated Time</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                              {% for stockticker in stocktickers %}
+                                <tr>
+                                  <th scope="row"><a href="{% url 'financeAnalysis:ticker_analysis' stockticker.id%}">{{ stockticker.id }}</a></th>
+                                  <td>{{ stockticker.name }}</td>
+                                  <td>{{ stockticker.industry }}</td>
+                                  <td>{{ stockticker.sector }}</td>
+                                  <td>{{ stockticker.exchange_market }}</td>
+                                  <td>{{ stockticker.last_sale|floatformat:2 }}</td>
+                                  <td>{{ stockticker.updated_time }}</td>
+                                </tr>
+                              {% endfor %}
+                              </tbody>
+                            </table>
+                </div>
+            </container>
+    </div>
+            {% if is_paginated %}
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <div  class="col col-sm-4 col-md-4 col-lg-4">
+                            <a class="btn btn-outline-primary" href="?page={{ page_obj.previous_page_number }}">Previous </a>
+                        </div>
+                    {% endif %}
+                    <div class="col col-sm-4 col-md-4 col-lg-4">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </div>
+                    {% if page_obj.has_next %}
+                        <div class="col col-sm-4 col-md-4 col-lg-4">
+                            <a class="btn btn-outline-primary" href="?page={{ page_obj.next_page_number }}" >Next </a>
+                        </div>
+                    {% endif %}
+                </ul>
+            {% else %}
+                <h3>Your Ticker Does not Exist</h3>
+                <p>Please try again</p>
+            {% endif %}
+    </div>
+{%  endblock %}

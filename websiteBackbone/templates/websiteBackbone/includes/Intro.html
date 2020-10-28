@@ -17,7 +17,7 @@
           the software development life cycle and operations in a professional setting.</p>
           <p> I wanted to utilize everything I was learning and to learn more! I established a homelab where I could maintain my own
               code and infrastructure. I had the servers to run, but I didn't have any exciting code to present to the world. I played around with the infrastructure, but eventually,
-              this needed to make it into production. It took a month while I worked and before I knew it, I had pierced the heavens and was <a href="./../posts/4"> live  </a> in the Cloud.
+              this needed to make it into production. It took a month while I worked and before I knew it, I had pierced the heavens and was <a href="{% url 'post-entry' 4 %}"> live  </a> in the Cloud.
           </p>
         </div>
         <div class="col-6 col-lg-4">
@@ -25,6 +25,6 @@
         </div>
       </div>
     </div>
-    <p>Learn more by <a href="./../contact/">contacting us</a>.</p>
+    <p>Learn more by <a href="{% url 'contact' %}">contacting us</a>.</p>
         {%  endblock %}
 </div>

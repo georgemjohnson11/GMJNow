@@ -3,7 +3,7 @@
     <div class="jumbotron jumbotron-fluid">
         <br/>
 
-        <a>This website brings analyzes over <a href="./finance/all/">3000 recent stock market listings </a> of a variety of industries including the <a
+        <a>This website brings analyzes over <a href="{% url 'financeAnalysis:stockticker-view' %}">3000 recent stock market listings </a> of a variety of industries including the <a
                 href="https://en.wikipedia.org/wiki/List_of_S%26P_500_companies" target="_blank">S&P 500</a> to suggest
             whether a stock is in an optimal purchasing position.
             You can search using the ticker symbols (i.e. Amazon is AMZN, Apple is AAPL, etc.)</p>

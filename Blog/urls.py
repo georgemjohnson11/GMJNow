@@ -21,6 +21,7 @@ urlpatterns = [
     path(r'posts/', include('manageBlog.urls')),
     path(r'finance/', include('financeAnalysis.urls')),
     path(r'analysis/', include('simpleAnalysis.urls')),
+    path(r'registration/', include("django.contrib.auth.urls")),
     path(r'positions/', include('positions.urls')),
     path(r'', include('websiteBackbone.urls')),
 ]
