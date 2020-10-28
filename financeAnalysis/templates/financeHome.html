@@ -2,7 +2,15 @@
 {% block title %}Home{% endblock %}
 {% block content %}
     <div class="jumbotron jumbotron-fluid">
-        <h2>Stock Ticker Symbol: {{ stock_ticker_symbol }}</h2>
+        <h2>Stock Ticker: {{ stock_ticker.name }} ({{ stock_ticker.id }})</h2>
+        <div class="container row">
+        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Active: {{ stock_ticker.active }}</div>
+        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Country: {{ stock_ticker.country }}</div>
+        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Market: {{ stock_ticker.exchange_market }}</div>
+        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">IPO Year: {{ stock_ticker.ipo_year }}</div>
+        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Last Sale: {{ stock_ticker.last_sale }}</div>
+        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Industry: {{ stock_ticker.industry }}</div>
+      </div>
         <container>
             <img class="img-fluid" src="data:image/png;base64,{{ view_portfolio_plot }}"/>
         </container>
@@ -20,7 +28,7 @@
             bands
             automatically widen when volatility increases and contract when volatility decreases.
         </p>
-        <h3>Simple Stats: </h3>
+        <h3>Simple Stat Buy Signal: </h3>
         {{ simpleStats|safe }}
         <br/>
         <p> Screening stocks can help decide quickly using particular indicators
@@ -52,7 +60,9 @@
             Optimal buying time is typically within 1-3 days of a green dot appearing.This
             looks for the 10.4 stochastic crosses above 4 day SMA after being oversold.
             <a target=_blank href=https://wishingwealthblog.com/2018/03/green-dot-strategy-defined/> More Info</a></p>
-        {{ green_line_values|safe }}
+        {% for i,j in green_dot_values %}
+        <div>GreenDot Buy Price: {{ j|safe }} Date: {{ i|safe }}</div>
+        {% endfor %}
         <br/>
         <h3>Simple Moving Averages (SMAs): </h3>
         <p><img class="img-fluid" src="data:image/png;base64,{{ viewBuySellMA }}"/></p>

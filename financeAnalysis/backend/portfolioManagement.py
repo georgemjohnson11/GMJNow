@@ -3,11 +3,14 @@
 
 import numpy as np
 import pandas as pd
-from datetime import datetime
+from datetime import date
 import matplotlib.pyplot as plt
 import pickle
 from django.conf import settings
 import os.path
+from django.db.models.functions import TruncDate
+from financeAnalysis.models import StockTicker, StockTickerHistory
+
 
 
 #Get the stock symbols for the portfolio
@@ -21,8 +24,40 @@ import os.path
 
 #Create a function to get stock prices and portfolio
 
-def getPortfolio(stocks):
-    return pd.read_pickle(os.path.join(settings.BASE_DIR, "stock_dfs", stocks + ".pickle"))
+def getPortfolio(stock_ticker_symbol, date=date.today()):
+    df = pd.DataFrame(list(StockTickerHistory.objects
+                           .filter(symbol_id = stock_ticker_symbol)
+                           .filter(updated_on__lte=date)
+                           .annotate(updated_date=TruncDate('updated_on'))
+                           .values('updated_date', 'adjusted_close'))).set_index('updated_date')
+    return df
+
+def getPortfolioAdvanced(stock_ticker_symbol, date=date.today()):
+    df = pd.DataFrame(list(StockTickerHistory.objects
+                           .filter(symbol_id = stock_ticker_symbol)
+                           .filter(updated_on__lte=date)
+                           .values('updated_on', 'high', 'low', 'open', 'volume', 'adjusted_close'))).set_index('updated_on')
+    return df
+
+def getPortfolio_ml(stock_ticker_symbol, date=date.today()):
+    df = pd.DataFrame(list(StockTickerHistory.objects
+                           .filter(symbol_id = stock_ticker_symbol)
+                           .filter(updated_on__lte=date)
+                           .annotate(updated_date=TruncDate('updated_on'))
+                           .values('updated_date', 'adjusted_close')))
+    if 'updated_date' in df.columns:
+        df.set_index('updated_date')
+    return df
+
+def getPortfolioDateTime(stock_ticker_symbol, date=date.today()):
+    df = pd.DataFrame(list(StockTickerHistory.objects
+                           .filter(symbol_id = stock_ticker_symbol)
+                           .filter(updated_on__lte=date)
+                           .values('updated_on', 'adjusted_close')))
+    if 'updated_on' in df.columns:
+        df['updated_on'] = pd.to_datetime(df['updated_on'])
+        df.set_index('updated_on', inplace=True)
+    return df
 
 def showPortfolioGraph(stocks, col = 'Adj Close'):
 
@@ -40,7 +75,7 @@ def showPortfolioGraph(stocks, col = 'Adj Close'):
 
 
 #Calculate simple return and other statistics
-def simpleReturns(stocks, col = 'Adj Close'):
+def simpleReturns(stocks, col = 'adjusted_close'):
     returnsPortfolio = getPortfolio(stocks)[col]
     # calculation is (daily_simple_returns[0] / daily_simple_returns[1]) - 1
     daily_simple_returns = returnsPortfolio.pct_change(1)
@@ -58,7 +93,7 @@ def simpleReturns(stocks, col = 'Adj Close'):
     standardDeviation = daily_simple_returns.std()
     return daily_simple_returns
 
-def showDailySimpleReturns(stocks, col = 'Adj Close'):
+def showDailySimpleReturns(stocks, col = 'adjusted_close'):
     daily_simple_returns = simpleReturns(stocks, col = col)
     for c in daily_simple_returns.columns.values:
         plt.plot(daily_simple_returns[c], lw=2, label=c)

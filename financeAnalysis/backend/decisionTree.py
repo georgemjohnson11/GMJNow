@@ -6,6 +6,7 @@ import pandas_datareader as web
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
+from financeAnalysis.backend.portfolioManagement import getPortfolio
 import matplotlib.pyplot as plt
 import pickle
 from django.conf import settings
@@ -13,10 +14,10 @@ import os.path
 
 def decisionTreePredictPrice(ticker):
     # collect the data
-    tickers = pd.read_pickle(os.path.join(settings.BASE_DIR, "stock_dfs", ticker + ".pickle"))
+    tickers = getPortfolio(ticker)
     future_days = 25
     #Create a new column (target) shifted 'x' units/days up
-    tickers['Prediction'] = tickers['Adj Close'].shift(-future_days)
+    tickers['Prediction'] = tickers['adjusted_close'].shift(-future_days)
     #print(df.head(4))
     #print(df.tail(4))
 
@@ -48,6 +49,6 @@ def decisionTreePredictPrice(ticker):
 
     valid = tickers[X.shape[0]:]
     valid['Predictions'] = predictions
-    return tickers, valid
+    return valid
 
 #plt.show()
