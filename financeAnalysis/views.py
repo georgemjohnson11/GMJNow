@@ -35,7 +35,7 @@ class StockTickerListView(ListView):
         context['stocktickers'] = stocktickers
         return context
 
-class financeAnalysisDetail():
+class financeAnalysisDetail:
     model = StockTickerHistory
     template_name = 'financeHome.html'
 

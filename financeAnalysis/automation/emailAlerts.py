@@ -22,7 +22,7 @@ def greendotAlert():
     three_days_alert = (dt.today() - datetime.timedelta(days=3))
     ticker_list = []
     for ticker in StockTicker.objects.all().values('id'):
-        if (StockTickerHistory.get_todays_history_from_symbol(ticker).green_dot_dates > three_days_alert):
+        if StockTickerHistory.get_todays_history_from_symbol(ticker).green_dot_dates > three_days_alert:
             ticker_list.append(ticker)
 
     separator = ', '
@@ -35,7 +35,7 @@ def greendotAlert():
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = ''
     msg.set_content(message)
-    if(ticker_list.any()):
+    if ticker_list.any():
         emailAlert(ticker_list,msg)
     return ticker_list, msg
 
