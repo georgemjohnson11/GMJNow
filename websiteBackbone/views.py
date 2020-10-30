@@ -31,7 +31,7 @@ def update_profile(request):
 def register(request):
      if request.method == "GET":
          return render(
-             request, "users/register.html",
+             request, "user/register.html",
              {"form": CustomUserCreationForm}
          )
      elif request.method == "POST":
@@ -39,7 +39,7 @@ def register(request):
          if form.is_valid():
              user = form.save()
              login(request, user)
-             return redirect(reverse("index"))
+             return redirect(reverse('index'))
 
 def about(request):
     return render(request, './websiteBackbone/about.html')

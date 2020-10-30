@@ -42,7 +42,7 @@ class financeAnalysisDetail:
     def get_context_data(self, **kwargs):
         context = super(financeAnalysisDetail,self).get_context_data(**kwargs)
 
-    def update():
+    def update(self):
         populate_todays_history()
 
     def analysis_page(request, stock_ticker_symbol=''):
