@@ -75,9 +75,9 @@ def buy_signal_indicator(ticker, date=datetime.today()):
 	otherDataList = pd.DataFrame(columns=["Earning Per Share", "Price to Earnings Ratio","Forward Dividend & Yield", "Earnings Date", "Last Dividend Date", "1y Target Est", "Day's Range","url"])
 	try:
 		df = getPortfolio(ticker)[-260:]
-		stock_info = StockTickerHistory.objects.get(symbol_id=ticker, updated_on=date)
+		stock_info = StockTickerHistory.get_todays_history_from_symbol(ticker, date)
 		days_ago_20 = date - timedelta(days=20)
-		stock_info_20_days_ago = stock_info = StockTickerHistory.objects.get(symbol_id=ticker, updated_on=days_ago_20)
+		stock_info_20_days_ago = StockTickerHistory.get_todays_history_from_symbol(ticker, days_ago_20)
 		# summary = parse(ticker)
 		# print(summary)
 		# pe = summary["PE Ratio (TTM)"]
@@ -92,8 +92,8 @@ def buy_signal_indicator(ticker, date=datetime.today()):
 		# 	otherDataList = otherDataList.append({"Earning Per Share": eps, "Price to Earnings Ratio":pe,"Forward Dividend & Yield": pctyield, "Earnings Date": earningsdate, "Last Dividend Date": lastdividenddate, "1y Target Est": one_year_est, "Day's Range": daysRange, "url": reference}, ignore_index=True)
 		# 	print(otherDataList)
 
-		low_of_52week=round(min(df["adjusted_close"][-260:]), 4)
-		high_of_52week=round(max(df["adjusted_close"][-260:]), 4)
+		low_of_52week=round(min(df["adjusted_close"]), 4)
+		high_of_52week=round(max(df["adjusted_close"]), 4)
 		currentClose = stock_info.adjusted_close
 		moving_average_150 = stock_info.sma_hundred_fifty_day
 		moving_average_200 = stock_info.sma_two_hundred_day

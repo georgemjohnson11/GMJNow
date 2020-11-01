@@ -27,7 +27,7 @@ def advanced_analysis(stock_ticker_symbol, date=dt.date.today()):
     except Exception as ex:
       print(ex)
     try:
-        print('svr prediction')
+        print('starting svr prediction')
         svr_prediction_build_plot(stock_ticker_symbol, date)
     except Exception as ex:
       print(ex)
@@ -41,6 +41,7 @@ def advanced_analysis(stock_ticker_symbol, date=dt.date.today()):
         decisionTreePrediction(stock_ticker_symbol, date)
     except Exception as ex:
       print(ex)
+    print('Finished advanced analysis')
 
 def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
     try:

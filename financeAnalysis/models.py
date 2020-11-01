@@ -58,9 +58,9 @@ class StockTickerHistory(models.Model):
         except Exception as e:
             return print(e)
 
-    def get_todays_history_from_symbol(symbol):
+    def get_todays_history_from_symbol(symbol, date=datetime.today()):
         try:
-            return StockTickerHistory.objects.filter(symbol_id=symbol).filter(updated_on__range=[datetime(2020,10,22),datetime.utcnow()]).last()
+            return StockTickerHistory.objects.filter(symbol_id=symbol).filter(updated_on__lte=date).last()
         except Exception as e:
             return print(e)
 
