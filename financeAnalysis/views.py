@@ -1,7 +1,7 @@
 from .backend.GL_loop import GL_calculator
 from .backend.plots import *
 from financeAnalysis.finance_form import FinanceForm
-from financeAnalysis.automation.get_stocks import populate_todays_history, backpopulate_stock_history_2020
+from financeAnalysis.automation.get_stocks import populate_todays_history, backpopulate_stock_history_2020, repopulate_todays_history
 from django.shortcuts import render, get_object_or_404
 import os
 from django.conf import settings
@@ -46,9 +46,14 @@ class financeAnalysisDetail:
         populate_todays_history()
         return render(request, 'websiteBackbone/home.html')
 
+    def repopulate(request):
+        repopulate_todays_history()
+        return render(request, 'websiteBackbone/home.html')
+
     def backpopulate(request):
         backpopulate_stock_history_2020()
         return render(request, 'websiteBackbone/home.html')
+
 
     def analysis_page(request, stock_ticker_symbol=''):
         errors = ""
@@ -58,7 +63,7 @@ class financeAnalysisDetail:
                 form = FinanceForm(request.POST)
                 if form.is_valid():
                     stock_ticker_symbol = form.cleaned_data['stock_ticker_symbol']
-                    stock_history = StockTickerHistory.get_history_from_symbol(symbol=stock_ticker_symbol)
+                    stock_history = StockTickerHistory.get_todays_history_from_symbol(symbol=stock_ticker_symbol)
                     stock_ticker = StockTicker.get_stock_ticker_from_symbol(stock_ticker_symbol)
                     portfolio_plot = stock_history.plot
                     svr_prediction_plot = stock_history.svr_plot
@@ -86,7 +91,7 @@ class financeAnalysisDetail:
                 return render(request, 'websiteBackbone/includes/404.html', args)
         else:
             try:
-                stock_history = StockTickerHistory.get_history_from_symbol(symbol=stock_ticker_symbol)
+                stock_history = StockTickerHistory.get_todays_history_from_symbol(symbol=stock_ticker_symbol)
                 stock_ticker = StockTicker.get_stock_ticker_from_symbol(stock_ticker_symbol)
                 portfolio_plot = stock_history.plot
                 svr_prediction_plot = stock_history.svr_plot

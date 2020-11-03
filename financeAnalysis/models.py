@@ -52,9 +52,9 @@ class StockTickerHistory(models.Model):
     sma_plot = models.TextField(blank=True, default="")
     svr_plot = models.TextField(blank=True, default="")
 
-    def get_history_from_symbol(symbol):
+    def get_history_from_symbol(symbol, date=datetime.today()):
         try:
-            return StockTickerHistory.objects.filter(symbol_id=symbol).last()
+            return StockTickerHistory.objects.filter(symbol_id=symbol).filter(updated_on__lte=date)
         except Exception as e:
             return print(e)
 

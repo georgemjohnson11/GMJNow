@@ -24,6 +24,7 @@ urlpatterns = [
          name='stockticker-view'),
     path(r'update/', views.financeAnalysisDetail.update, name='update'),
     path(r'backpopulate/', views.financeAnalysisDetail.backpopulate, name='backpopulate'),
+    path(r'repopulate/', views.financeAnalysisDetail.repopulate, name='repopulate'),
     path(r'<str:stock_ticker_symbol>/', views.financeAnalysisDetail.analysis_page, name='ticker_analysis'),
     re_path(r'', views.financeAnalysisDetail.analysis_page, name='analysis_page'),
 ]

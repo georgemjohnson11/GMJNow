@@ -11,7 +11,7 @@ import numpy as np
 from io import BytesIO
 from financeAnalysis.models import StockTickerHistory, StockTicker
 from financeAnalysis.backend.decisionTree import decisionTreePredictPrice
-from financeAnalysis.backend.portfolioManagement import getPortfolio, getPortfolioDateTime, getPortfolioAdvanced
+from financeAnalysis.backend.portfolioManagement import getPortfolio, getPortfolioDateTime, getPortfolio_ml, getPortfolioAdvanced
 import base64
 
 def advanced_analysis(stock_ticker_symbol, date=dt.date.today()):
@@ -45,7 +45,6 @@ def advanced_analysis(stock_ticker_symbol, date=dt.date.today()):
 
 def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
     try:
-        stocks = pd.DataFrame()
         plt.style.use('fivethirtyeight')
         img = BytesIO()
         stocks = getPortfolioAdvanced(stock_ticker_symbol, date)[-300:]
@@ -175,7 +174,7 @@ def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
             ax1.plot_date([dates[index] - (timeD * .075), dates[index] + timeD],  # Plots horizontal line at pivot value
                           [6 +
                            pivots[index], pivots[index]], linestyle="--", linewidth=1, marker=',', color='#006989')
-            ax1.annotate(str(pivots[index]), (mdates.date2num(dates[index]), pivots[index]), xytext=(-10, 7),
+            ax1.annotate(str(pivots[index]), (dates[index], pivots[index]), xytext=(-10, 7),
                          textcoords='offset points', fontsize=10, arrowprops=dict(arrowstyle='-|>'), color='#006989')
 
         ax1.set_xlabel('Date')  # set x axis label
@@ -203,7 +202,7 @@ def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
         plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
         plt.close('all')
         img.close()
-        StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=stocks.index[-1],
+        StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=date,
                                                     defaults={'sma_fifty_day': stocks['SMA50'][-1],
                                                               'green_dot_dates': greenDotDate,
                                                               'green_dot_values': greenDot,
@@ -214,10 +213,8 @@ def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
 
 def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
     try:
-        tickers = pd.DataFrame()
-        valid = pd.DataFrame()
         valid = decisionTreePredictPrice(stock_ticker_symbol)
-        if tickers is not None and valid is not None:
+        if valid is not None:
           img = BytesIO()
           # Plot the models on a graph to see which has the best fit
           plt.figure(figsize=(12, 8))
@@ -248,12 +245,12 @@ def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
 
 def showRSI(stock_ticker_symbol, date=dt.date.today()):
     try:
-        tickers = pd.DataFrame()
         tickers = getPortfolio(stock_ticker_symbol, date)[-500:]
         # Calculate RSI
         # Get the difference in daily price
         if tickers is not None:
-          diff = tickers['adjusted_close'].diff(1).dropna()
+          diff = tickers.diff(1)
+          diff.dropna()
           up_chg = 0 * diff
           down_chg = 0 * diff
 
@@ -293,7 +290,7 @@ def showRSI(stock_ticker_symbol, date=dt.date.today()):
           plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
           img.seek(0)
           plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-          StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=tickers.index[-1],
+          StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=date,
                                                       defaults={'rsi_plot': plot_url, 'rsi': tickers['RSI'][-1]})
           plt.close('all')
           img.close()
@@ -304,8 +301,7 @@ def showRSI(stock_ticker_symbol, date=dt.date.today()):
 #Work on adding datetime values as NaT
 def show_buy_sell_points(stock_ticker_symbol, date=dt.date.today()):
     try:
-        tickers = pd.DataFrame()
-        tickers = getPortfolioDateTime(stock_ticker_symbol, date)[-600:]
+        tickers = getPortfolio(stock_ticker_symbol, date)[-600:]
         signalPriceBuy = []
         signalPriceSell = []
 
@@ -313,8 +309,8 @@ def show_buy_sell_points(stock_ticker_symbol, date=dt.date.today()):
         # Calculate moving averages
         for x in smasUsed:  # This for loop calculates the SMAs for the stated periods and appends to dataframe
             sma = x
-            tickers['SMA' + str(sma)] = tickers['adjusted_close'].rolling(window=sma).mean()  # calcaulates sma and creates col
-            tickers['SMA' + str(sma)] = tickers['SMA' + str(sma)].dropna()
+            tickers['SMA' + str(sma)] = tickers['adjusted_close'].rolling(window=sma).mean()
+            # calcaulates sma and creates col
         flag = -1
         for i in range(len(tickers.index)):
             if tickers['SMA30'][i] > tickers['SMA100'][i]:
@@ -359,7 +355,7 @@ def show_buy_sell_points(stock_ticker_symbol, date=dt.date.today()):
         plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
         img.seek(0)
         plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-        StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=tickers.index[-1],
+        StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=date,
                                                     defaults={'sma_plot': plot_url,
                                                               'sma_thirty_day': tickers['SMA30'][-1],
                                                               'sma_hundred_fifty_day': tickers['SMA30'][-1],
@@ -374,7 +370,6 @@ def show_buy_sell_points(stock_ticker_symbol, date=dt.date.today()):
 # function to make predictions using 3 different support vector regression models with 3 different kernals
 def svr_prediction_build_plot(stock_ticker_symbol, date=dt.date.today()):
     try:
-        tickers = pd.DataFrame()
         now = dt.datetime.today()
         DD = dt.timedelta(days=1)
         tomorrow = [(now + DD).day]
@@ -419,7 +414,7 @@ def svr_prediction_build_plot(stock_ticker_symbol, date=dt.date.today()):
         plt.savefig(img, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
         img.seek(0)
         plot_url = base64.b64encode(img.getvalue()).decode('utf-8')
-        StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=tickers.index[-1],
+        StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=date,
                                                     defaults={'svr_plot': plot_url})
         plt.close('all')
         img.close()

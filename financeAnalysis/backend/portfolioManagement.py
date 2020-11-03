@@ -36,7 +36,9 @@ def getPortfolioAdvanced(stock_ticker_symbol, date=date.today()):
     df = pd.DataFrame(list(StockTickerHistory.objects
                            .filter(symbol_id = stock_ticker_symbol)
                            .filter(updated_on__lte=date)
-                           .values('updated_on', 'high', 'low', 'open', 'volume', 'adjusted_close'))).set_index('updated_on')
+                           .values('updated_on', 'high', 'low', 'open', 'volume', 'adjusted_close')))
+    if 'updated_on' in df.columns:
+        df.set_index('updated_on')
     return df
 
 def getPortfolio_ml(stock_ticker_symbol, date=date.today()):

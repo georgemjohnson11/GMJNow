@@ -71,13 +71,13 @@ def parse(ticker):
 		raise SystemExit(e)
 
 def buy_signal_indicator(ticker, date=datetime.today()):
-	exportList= pd.DataFrame(columns=["50 Day SMA", "150 Day SMA", "200 Day SMA", "52 Week Low", "52 week High", "RSI", "Buy Signal"])
-	otherDataList = pd.DataFrame(columns=["Earning Per Share", "Price to Earnings Ratio","Forward Dividend & Yield", "Earnings Date", "Last Dividend Date", "1y Target Est", "Day's Range","url"])
+	#exportList= pd.DataFrame(columns=["50 Day SMA", "150 Day SMA", "200 Day SMA", "52 Week Low", "52 week High", "RSI", "Buy Signal"])
+	#otherDataList = pd.DataFrame(columns=["Earning Per Share", "Price to Earnings Ratio","Forward Dividend & Yield", "Earnings Date", "Last Dividend Date", "1y Target Est", "Day's Range","url"])
 	try:
 		df = getPortfolio(ticker)[-260:]
 		stock_info = StockTickerHistory.get_todays_history_from_symbol(ticker, date)
 		days_ago_20 = date - timedelta(days=20)
-		stock_info_20_days_ago = StockTickerHistory.get_todays_history_from_symbol(ticker, days_ago_20)
+		stock_info_20_days_ago = StockTickerHistory.get_todays_history_from_symbol(ticker, days_ago_20.date())
 		# summary = parse(ticker)
 		# print(summary)
 		# pe = summary["PE Ratio (TTM)"]
@@ -165,12 +165,10 @@ def buy_signal_indicator(ticker, date=datetime.today()):
 		# 	cond_9 = True
 		# 	cond_10 = True
 		# 	cond_11 = True
-
-
 		if cond_1 and cond_2 and cond_3 and cond_4 and cond_5 and cond_6 and cond_7 and cond_8:
 			stock_info.simple_stat_buy_signal = True
 			stock_info.save()
 	except Exception:
 		print("No data on "+ticker)
-	return exportList
+	return df
 
