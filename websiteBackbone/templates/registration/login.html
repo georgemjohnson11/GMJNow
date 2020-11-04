@@ -1,24 +1,32 @@
 {% extends "websiteBackbone/header.html" %}
 {% block content %}
-<style>
-    label, input {
-        display: block;
-    }
-    span.helptext {
-        display: none;
-    }
-</style>
+    <style>
+        label, input {
+            display: block;
+        }
 
-<h2>Login</h2>
+        span.helptext {
+            display: none;
+        }
+    </style>
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-lg-8">
+                    <h2>Login</h2>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Login">
-</form>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <input type="submit" value="Login">
+                    </form>
 
-<a href="{% url 'index' %}">Back to dashboard</a>
-<a href="{% url 'register' %}">Register</a>
-<a href="{% url 'password_reset' %}">Reset password</a>
-<a href="{% url 'password_change' %}">Change password</a>
+                    <a href="{% url 'index' %}">Back to dashboard</a> <br/>
+                    <a href="{% url 'register' %}">Register</a> <br/>
+                    <a href="{% url 'password_reset' %}">Reset password</a> <br/>
+                    {#<a href="{% url 'password_change' %}">Change password</a>#}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

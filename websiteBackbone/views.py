@@ -3,35 +3,31 @@ from django.shortcuts import render
 from django.core.mail import EmailMessage
 from django.contrib import messages
 from django.http import HttpResponse, BadHeaderError, HttpResponseRedirect
-from .contactform import ContactForm, UserForm, ProfileForm
 from django.contrib.auth import login
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from websiteBackbone.forms import CustomUserCreationForm
+from websiteBackbone.forms import CustomUserCreationForm, ContactForm
 
 
 def update_profile(request):
     if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=request.user)
-        profile_form = ProfileForm(request.POST, instance=request.user.profile)
-        if user_form.is_valid() and profile_form.is_valid():
+        user_form = CustomUserCreationForm(request.POST, instance=request.user)
+        if user_form.is_valid() and request.user.is_authenticated:
             user_form.save()
-            profile_form.save()
-            messages.success(request, _('Your profile was successfully updated!'))
-            return render(request, 'websiteBackbone/templates/registration/user_profile.html')
+            messages.success(request, ('Your profile was successfully updated!'))
+            return render(request, 'registration/user_profile.html')
         else:
-            messages.error(request, _('Please correct the error below.'))
+            messages.error(request, ('Please login or correct the error below.'))
     else:
-        user_form = UserForm(instance=request.user)
-        profile_form = ProfileForm(instance=request.user.profile)
-    return render(request, 'websiteBackbone/templates/registration/edit_user_profile.html',
-                  {'user_form': user_form, 'profile_form': profile_form })
+        user_form = CustomUserCreationForm(instance=request.user)
+    return render(request, 'registration/password_change_form.html',
+                  {'user_form': user_form} )
 
 
 def register(request):
      if request.method == "GET":
          return render(
-             request, "user/register.html",
+             request, "registration/register.html",
              {"form": CustomUserCreationForm}
          )
      elif request.method == "POST":
@@ -40,6 +36,11 @@ def register(request):
              user = form.save()
              login(request, user)
              return redirect(reverse('index'))
+         messages.error(request, ('Please correct the error below.'))
+         return render(
+             request, "registration/register.html",
+             {"form": CustomUserCreationForm}
+         )
 
 def about(request):
     return render(request, './websiteBackbone/about.html')

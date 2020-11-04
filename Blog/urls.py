@@ -15,13 +15,15 @@ Including another URLconf
 """
 from django.urls import path, include
 from django.contrib import admin
+from websiteBackbone import views
 
 urlpatterns = [
     path(r'admin/', admin.site.urls),
     path(r'posts/', include('manageBlog.urls')),
     path(r'finance/', include('financeAnalysis.urls')),
     path(r'analysis/', include('simpleAnalysis.urls')),
-    path(r'registration/', include("django.contrib.auth.urls")),
+    path(r'register/', views.register, name="register"),
+    path(r'accounts/', include("django.contrib.auth.urls")),
     path(r'positions/', include('positions.urls')),
     path(r'', include('websiteBackbone.urls')),
 ]

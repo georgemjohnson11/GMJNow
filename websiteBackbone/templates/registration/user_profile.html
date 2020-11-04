@@ -1,11 +1,11 @@
 {% extends "websiteBackbone/header.html" %}
 {% block content %}
+    <div class="jumbotron jumbotron-fluid">
 
 <h2>{{ user.get_full_name }}</h2>
 <ul>
   <li>Username: {{ user.username }}</li>
   <li>Email: {{ user.email }}</li>
-  <li>Location: {{ user.userprofile.location }}</li>
-  <li>Birth Date: {{ user.userprofile.birth_date }}</li>
 </ul>
+</div>
 {% endblock %}

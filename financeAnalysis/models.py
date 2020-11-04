@@ -1,6 +1,5 @@
 from django.db import models
 from datetime import datetime
-from websiteBackbone.models import Profile
 from django.contrib.postgres.fields import ArrayField
 
 class StockTicker(models.Model):
@@ -99,8 +98,6 @@ class Portfolio(models.Model):
     purchased_on = models.DateTimeField()
     quantity = models.FloatField()
     cost_basis = models.FloatField(default=0.0)
-    account_id = models.ForeignKey("Account", on_delete=models.CASCADE)
-    userprofile_id = models.ForeignKey(Profile, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.symbol
