@@ -47,7 +47,7 @@ def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
     try:
         plt.style.use('fivethirtyeight')
         img = BytesIO()
-        stocks = getPortfolioAdvanced(stock_ticker_symbol, date)[-300:]
+        stocks = getPortfolioAdvanced(stock_ticker_symbol, date)
         fig, ax1 = plt.subplots(facecolor='#C1DFF0', figsize=(12, 8))  # Create Plots
         ax1.annotate("Last Closing\n Price: $" + str(stocks['adjusted_close'][-1])[0:6],
                      (stocks.index[-1], stocks['adjusted_close'][-1]),
@@ -174,7 +174,7 @@ def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
             ax1.plot_date([dates[index] - (timeD * .075), dates[index] + timeD],  # Plots horizontal line at pivot value
                           [6 +
                            pivots[index], pivots[index]], linestyle="--", linewidth=1, marker=',', color='#006989')
-            ax1.annotate(str(pivots[index]), (dates[index], pivots[index]), xytext=(-10, 7),
+            ax1.annotate(str(pivots[index]), (mdates.date2num(dates[index]), pivots[index]), xytext=(-10, 7),
                          textcoords='offset points', fontsize=10, arrowprops=dict(arrowstyle='-|>'), color='#006989')
 
         ax1.set_xlabel('Date')  # set x axis label
@@ -226,8 +226,8 @@ def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
           plt.title('Decision Tree Prediction')
           plt.xlabel('Days')
           tickers = getPortfolio(stock_ticker_symbol)
-          plt.plot(tickers['adjusted_close'][-200:])
-          plt.plot(valid[['adjusted_close', 'Predictions'][-200:]])
+          plt.plot(tickers['adjusted_close'])
+          plt.plot(valid[['adjusted_close', 'Predictions']])
           plt.legend(['Original', 'Valid', 'Prediction'], loc='best', prop={'size': 8})
           ax1.set_facecolor('#C1DFF0')
           plt.rcParams['figure.facecolor'] = '#C1DFF0'
@@ -245,7 +245,7 @@ def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
 
 def showRSI(stock_ticker_symbol, date=dt.date.today()):
     try:
-        tickers = getPortfolio(stock_ticker_symbol, date)[-500:]
+        tickers = getPortfolio(stock_ticker_symbol, date)
         # Calculate RSI
         # Get the difference in daily price
         if tickers is not None:
@@ -301,7 +301,7 @@ def showRSI(stock_ticker_symbol, date=dt.date.today()):
 #Work on adding datetime values as NaT
 def show_buy_sell_points(stock_ticker_symbol, date=dt.date.today()):
     try:
-        tickers = getPortfolio(stock_ticker_symbol, date)[-600:]
+        tickers = getPortfolio(stock_ticker_symbol, date)
         signalPriceBuy = []
         signalPriceSell = []
 

@@ -10,13 +10,13 @@
                     <hr>
                     <p>{{ post.bodytext|safe|linebreaks }}</p>
                 </div>
-                <h2>Comments</h2>
-                {% for comment in post.comments %}
-                    <h3>{{ comment.author.name }}
-                        <small>on {{ comment.created_on }}</small>
-                    </h3>
-                    {{ comment.text }}
-                {% endfor %}
+{#                <h2>Comments</h2>#}
+{#                {% for comment in post.comments %}#}
+{#                    <h3>{{ comment.author.name }}#}
+{#                        <small>on {{ comment.created_on }}</small>#}
+{#                    </h3>#}
+{#                    {{ comment.text }}#}
+{#                {% endfor %}#}
             </div>
         </div>
     </main>

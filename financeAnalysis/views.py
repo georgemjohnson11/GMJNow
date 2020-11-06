@@ -63,7 +63,7 @@ class financeAnalysisDetail:
                 form = FinanceForm(request.POST)
                 if form.is_valid():
                     stock_ticker_symbol = form.cleaned_data['stock_ticker_symbol']
-                    stock_history = StockTickerHistory.get_todays_history_from_symbol(symbol=stock_ticker_symbol)
+                    stock_history = StockTickerHistory.get_todays_history_from_symbol(stock_ticker_symbol)
                     stock_ticker = StockTicker.get_stock_ticker_from_symbol(stock_ticker_symbol)
                     portfolio_plot = stock_history.plot
                     svr_prediction_plot = stock_history.svr_plot
@@ -84,14 +84,13 @@ class financeAnalysisDetail:
                     args['view_portfolio_plot'] = portfolio_plot
                     args['viewBuySellMA'] = buy_sell_moving_avg_plot
                     args['green_dot_values'] = zip(green_dot_dates,green_dot_values)
-                    print("Processing complete")
                     return render(request, 'financeHome.html', args)
             except Exception as e:
                 args['errors'] = "Please try another ticker"
                 return render(request, 'websiteBackbone/includes/404.html', args)
         else:
             try:
-                stock_history = StockTickerHistory.get_todays_history_from_symbol(symbol=stock_ticker_symbol)
+                stock_history = StockTickerHistory.get_todays_history_from_symbol(stock_ticker_symbol)
                 stock_ticker = StockTicker.get_stock_ticker_from_symbol(stock_ticker_symbol)
                 portfolio_plot = stock_history.plot
                 svr_prediction_plot = stock_history.svr_plot
