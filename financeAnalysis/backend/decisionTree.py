@@ -12,9 +12,8 @@ import pickle
 from django.conf import settings
 import os.path
 
-def decisionTreePredictPrice(ticker):
+def decisionTreePredictPrice(tickers):
     # collect the data
-    tickers = getPortfolio(ticker)
     future_days = 25
     #Create a new column (target) shifted 'x' units/days up
     tickers['Prediction'] = tickers['adjusted_close'].shift(-future_days)

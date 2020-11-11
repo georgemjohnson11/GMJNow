@@ -11,24 +11,25 @@ import numpy as np
 from io import BytesIO
 from financeAnalysis.models import StockTickerHistory, StockTicker
 from financeAnalysis.backend.decisionTree import decisionTreePredictPrice
-from financeAnalysis.backend.portfolioManagement import getPortfolio, getPortfolioDateTime, getPortfolio_ml, getPortfolioAdvanced
+from financeAnalysis.backend.portfolioManagement import getPortfolio, getPortfolio_ml, getPortfolioAdvanced
 import base64
 
 def advanced_analysis(stock_ticker_symbol, date=dt.date.today()):
     now = dt.date.today()
+    tickers = getPortfolio(stock_ticker_symbol, date)
     try:
-        print('starting buy sell points')
-        show_buy_sell_points(stock_ticker_symbol, date)
+        print('starting decision tree prediction')
+        decisionTreePrediction(stock_ticker_symbol, tickers[['adjusted_close']], date)
     except Exception as ex:
       print(ex)
     try:
         print('starting rsi')
-        showRSI(stock_ticker_symbol, date)
+        showRSI(stock_ticker_symbol, tickers[['adjusted_close']], date)
     except Exception as ex:
       print(ex)
     try:
         print('starting svr prediction')
-        svr_prediction_build_plot(stock_ticker_symbol, date)
+        svr_prediction_build_plot(stock_ticker_symbol, tickers[['adjusted_close']], date)
     except Exception as ex:
       print(ex)
     try:
@@ -37,8 +38,8 @@ def advanced_analysis(stock_ticker_symbol, date=dt.date.today()):
     except Exception as ex:
         print(ex)
     try:
-        print('starting decision tree prediction')
-        decisionTreePrediction(stock_ticker_symbol, date)
+        print('starting buy sell points')
+        show_buy_sell_points(stock_ticker_symbol, tickers[['adjusted_close']], date)
     except Exception as ex:
       print(ex)
     print('Finished advanced analysis')
@@ -211,9 +212,9 @@ def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
     except Exception as ex:
         print(ex)
 
-def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
+def decisionTreePrediction(stock_ticker_symbol, tickers, date=dt.date.today()):
     try:
-        valid = decisionTreePredictPrice(stock_ticker_symbol)
+        valid = decisionTreePredictPrice(tickers)
         if valid is not None:
           img = BytesIO()
           # Plot the models on a graph to see which has the best fit
@@ -225,7 +226,6 @@ def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
           plt.style.use('fivethirtyeight')
           plt.title('Decision Tree Prediction')
           plt.xlabel('Days')
-          tickers = getPortfolio(stock_ticker_symbol)
           plt.plot(tickers['adjusted_close'])
           plt.plot(valid[['adjusted_close', 'Predictions']])
           plt.legend(['Original', 'Valid', 'Prediction'], loc='best', prop={'size': 8})
@@ -243,11 +243,8 @@ def decisionTreePrediction(stock_ticker_symbol, date=dt.date.today()):
         print(ex)
 
 
-def showRSI(stock_ticker_symbol, date=dt.date.today()):
+def showRSI(stock_ticker_symbol, tickers, date=dt.date.today()):
     try:
-        tickers = getPortfolio(stock_ticker_symbol, date)
-        # Calculate RSI
-        # Get the difference in daily price
         if tickers is not None:
           diff = tickers.diff(1)
           diff.dropna()
@@ -299,9 +296,9 @@ def showRSI(stock_ticker_symbol, date=dt.date.today()):
         print(ex)
 
 #Work on adding datetime values as NaT
-def show_buy_sell_points(stock_ticker_symbol, date=dt.date.today()):
+def show_buy_sell_points(stock_ticker_symbol, tickers, date=dt.date.today()):
     try:
-        tickers = getPortfolio(stock_ticker_symbol, date)
+
         signalPriceBuy = []
         signalPriceSell = []
 
@@ -368,14 +365,11 @@ def show_buy_sell_points(stock_ticker_symbol, date=dt.date.today()):
 
 
 # function to make predictions using 3 different support vector regression models with 3 different kernals
-def svr_prediction_build_plot(stock_ticker_symbol, date=dt.date.today()):
+def svr_prediction_build_plot(stock_ticker_symbol, tickers, date=dt.date.today()):
     try:
         now = dt.datetime.today()
         DD = dt.timedelta(days=1)
         tomorrow = [(now + DD).day]
-
-        tickers = getPortfolio(stock_ticker_symbol, date)
-
         dates = tickers.index[-20:]
         closing_price = tickers.loc[:, 'adjusted_close'][-20:]
         dates = np.reshape(dates.values, (len(dates.values), 1))  # convert to 1xn dimension
