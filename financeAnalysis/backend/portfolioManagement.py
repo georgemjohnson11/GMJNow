@@ -3,7 +3,7 @@
 
 import numpy as np
 import pandas as pd
-from datetime import date
+from datetime import datetime
 import matplotlib.pyplot as plt
 import pickle
 from django.conf import settings
@@ -24,22 +24,22 @@ from financeAnalysis.models import StockTicker, StockTickerHistory
 
 #Create a function to get stock prices and portfolio
 
-def getPortfolio(stock_ticker_symbol, date=date.today()):
+def getPortfolio(stock_ticker_symbol, date=datetime.today()):
     df = pd.DataFrame(list(StockTickerHistory.objects
                            .filter(symbol_id = stock_ticker_symbol)
-                           .filter(updated_on__lte=date)
+                           .filter(updated_on__range=[datetime(2018,7,25), date])
                            .annotate(updated_date=TruncDate('updated_on'))
                            .values('updated_date', 'adjusted_close'))).set_index('updated_date')
     return df
 
-def getPortfolioAdvanced(stock_ticker_symbol, date=date.today()):
+def getPortfolioAdvanced(stock_ticker_symbol, date=datetime.today()):
     df = pd.DataFrame(list(StockTickerHistory.objects
                            .filter(symbol_id = stock_ticker_symbol)
-                           .filter(updated_on__lte=date)
+                           .filter(updated_on__range=[datetime(2018,7,25),date])
                            .values('updated_on', 'high', 'low', 'open', 'volume', 'adjusted_close'))).set_index('updated_on')
     return df
 
-def getPortfolio_ml(stock_ticker_symbol, date=date.today()):
+def getPortfolio_ml(stock_ticker_symbol, date=datetime.today()):
     df = pd.DataFrame(list(StockTickerHistory.objects
                            .filter(symbol_id = stock_ticker_symbol)
                            .filter(updated_on__lte=date)
@@ -49,7 +49,7 @@ def getPortfolio_ml(stock_ticker_symbol, date=date.today()):
         df.set_index('updated_date')
     return df
 
-def getPortfolioDateTime(stock_ticker_symbol, date=date.today()):
+def getPortfolioDateTime(stock_ticker_symbol, date=datetime.today()):
     df = pd.DataFrame(list(StockTickerHistory.objects
                            .filter(symbol_id = stock_ticker_symbol)
                            .filter(updated_on__lte=date)

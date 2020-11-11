@@ -22,6 +22,9 @@ app_name = 'financeAnalysis'
 urlpatterns = [
     path(r'all/', views.StockTickerListView.as_view(model=StockTicker, template_name="views/allTickers.html"),
          name='stockticker-view'),
-    path(r'<str:symbol_id>/', DetailView.as_view(model=StockTickerHistory, template_name="views/finance.html"), name='symbol_id'),
+    path(r'update/', views.financeAnalysisDetail.update, name='update'),
+    path(r'backpopulate/', views.financeAnalysisDetail.backpopulate, name='backpopulate'),
+    path(r'repopulate/', views.financeAnalysisDetail.repopulate, name='repopulate'),
+    path(r'<str:stock_ticker_symbol>/', views.financeAnalysisDetail.analysis_page, name='ticker_analysis'),
     re_path(r'', views.financeAnalysisDetail.analysis_page, name='analysis_page'),
 ]

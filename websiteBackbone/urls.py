@@ -16,9 +16,9 @@ Including another URLconf
 from django.urls import path, include
 from . import views
 
+
 urlpatterns = [
     path(r'contact/', views.contact, name='contact'),
-    path(r'registration/', include("django.contrib.auth.urls")),
     path(r'submission/', views.submission, name='submission'),
     path(r'about/', views.about, name='about'),
     path(r'privacypolicy/', views.privacypolicy, name='privacypolicy'),

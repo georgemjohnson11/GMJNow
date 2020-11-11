@@ -25,7 +25,7 @@ def save_sp500_tickers():
     for row in table.findAll('tr')[1:]:
         ticker = row.findAll('td')[0].text
         date = row.findAll('td')[6].text
-        if(date):
+        if date:
             StockTicker.objects.update_or_create(id=ticker[:-1],
                                                  defaults={ 'active': True,
                                                             'is_currency':False,
@@ -39,8 +39,6 @@ def save_sp500_tickers():
 
 def compile_data_to_columns(date=datetime.today()):
     tickers = save_sp500_tickers()
-    main_df = getPortfolio_ml('V', datetime(2020, 10, 21))
-    main_df.rename(columns={'adjusted_close': 'V'}, inplace=True)
     for ticker in enumerate(tickers['Ticker']):
         df = getPortfolio_ml(ticker, datetime(2020, 10, 21))
         df.rename(columns = {'adjusted_close': ticker}, inplace=True)

@@ -4,8 +4,7 @@ import smtplib
 from email.message import EmailMessage
 import datetime
 from datetime import datetime as dt
-from financeAnalysis.backend.GL_loop import GL_calculator
-from financeAnalysis.backend.StockScreener import movingAverageAnalysis
+from financeAnalysis.models import StockTicker, StockTickerHistory
 import pickle
 
 EMAIL_ADDRESS = os.environ.get('EMAIL_USER')
@@ -19,20 +18,12 @@ def emailAlert(tickers, msg):
         smtp.send_message(msg)
 
 
-def greendotAlertSP500():
-    with open("stock_dfs/sp500tickers.pickle", "rb") as f:
-        tickers = pickle.load(f)
-
+def greendotAlert():
     three_days_alert = (dt.today() - datetime.timedelta(days=3))
     ticker_list = []
-    for ticker in tickers['Ticker']:
-        lastgreendot = GL_calculator(ticker.replace('.','-'))
-        if(lastgreendot['Dates'].any()):
-            dt_green_day = lastgreendot['Dates'][-1:].item()
-            dt_green_day = dt_green_day.to_pydatetime()
-            if(type(dt_green_day) is dt):
-                if (dt_green_day > three_days_alert):
-                    ticker_list.append(ticker)
+    for ticker in StockTicker.objects.all().values('id'):
+        if StockTickerHistory.get_todays_history_from_symbol().green_dot_dates > three_days_alert:
+            ticker_list.append(ticker)
 
     separator = ', '
     message = "The following " + separator.join(ticker_list) +" have crossed the Green Dot threshold"+\
@@ -44,20 +35,14 @@ def greendotAlertSP500():
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = ''
     msg.set_content(message)
-    if(ticker_list.any()):
+    if ticker_list.any():
         emailAlert(ticker_list,msg)
     return ticker_list, msg
 
 def simpleStats_Buy_AlertSP500():
-    with open("stock_dfs/sp500tickers.pickle", "rb") as f:
-        tickers = pickle.load(f)
 
     three_days_alert = (dt.today() - datetime.timedelta(days=3))
     ticker_list = []
-    for ticker in tickers['Ticker']:
-        buySell = movingAverageAnalysis(ticker.replace('.','-'))['Buy Signal'].item()
-        if(buySell == 'Yes'):
-            ticker_list.append(ticker)
     print(ticker_list)
     separator = ', '
     message = "The following " + separator.join(ticker_list) +" have a Buy Signal today"+\

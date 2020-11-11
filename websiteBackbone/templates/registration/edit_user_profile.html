@@ -1,0 +1,24 @@
+{% extends "websiteBackbone/header.html" %}
+{% block content %}
+<div class="container-fluid">
+      <div class="row">
+        <div class="col-12 col-sm-6 col-lg-8">
+<h2>Change Password</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Change">
+</form>
+
+<h2>Update Account</h2>
+
+<form method="post">
+  {% csrf_token %}
+  {{ user_form.as_p }}
+  <button type="submit">Save changes</button>
+</form>
+</div>
+</div>
+</div>
+{% endblock %}

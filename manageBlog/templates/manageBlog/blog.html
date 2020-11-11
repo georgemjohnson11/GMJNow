@@ -14,7 +14,7 @@
                             <ul class="list-unstyled mt-3 mb-4">
                                 {{ post.bodytext|truncatechars:400|safe|linebreaks }}
                             </ul>
-                            <a href="/posts/{{ post.id }}"> Read More...  </a>
+                            <a href="{% url 'post-entry' post.pk%}"> Read More...  </a>
                         </div>
                     </div>
                 </div>

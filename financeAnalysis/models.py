@@ -1,6 +1,5 @@
 from django.db import models
 from datetime import datetime
-from websiteBackbone.models import Profile
 from django.contrib.postgres.fields import ArrayField
 
 class StockTicker(models.Model):
@@ -52,15 +51,15 @@ class StockTickerHistory(models.Model):
     sma_plot = models.TextField(blank=True, default="")
     svr_plot = models.TextField(blank=True, default="")
 
-    def get_history_from_symbol(symbol):
+    def get_history_from_symbol(symbol, date=datetime.today()):
         try:
-            return StockTickerHistory.objects.filter(symbol_id=symbol).last()
+            return StockTickerHistory.objects.filter(symbol_id=symbol).filter(updated_on__lte=date)
         except Exception as e:
             return print(e)
 
-    def get_todays_history_from_symbol(symbol):
+    def get_todays_history_from_symbol(symbol, date=datetime.today()):
         try:
-            return StockTickerHistory.objects.filter(symbol_id=symbol).filter(updated_on__range=[datetime(2020,10,22),datetime.utcnow()]).last()
+            return StockTickerHistory.objects.filter(symbol_id=symbol).filter(updated_on__lte=date).last()
         except Exception as e:
             return print(e)
 
@@ -99,8 +98,6 @@ class Portfolio(models.Model):
     purchased_on = models.DateTimeField()
     quantity = models.FloatField()
     cost_basis = models.FloatField(default=0.0)
-    account_id = models.ForeignKey("Account", on_delete=models.CASCADE)
-    userprofile_id = models.ForeignKey(Profile, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.symbol

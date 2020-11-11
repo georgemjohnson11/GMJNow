@@ -20,5 +20,5 @@ from . import views
 
 urlpatterns = [
     path(r'', views.BlogListView.as_view(), name='posts-view'),
-    path(r'<int:pk>', DetailView.as_view(model=Post, template_name="manageBlog/post.html"))
+    path(r'<int:id>/', DetailView.as_view(model=Post, template_name="manageBlog/post.html"), name='post-entry')
     ]
