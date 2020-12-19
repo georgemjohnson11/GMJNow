@@ -24,10 +24,17 @@ def save_sp500_tickers():
     start = datetime(2010, 1, 1)
     for row in table.findAll('tr')[1:]:
         ticker = row.findAll('td')[0].text
+        name = row.findAll('td')[1].text
+        industry = row.findAll('td')[3].text
+        sector = row.findAll('td')[4].text
         date = row.findAll('td')[6].text
         if date:
             StockTicker.objects.update_or_create(id=ticker[:-1],
                                                  defaults={ 'active': True,
+                                                            'industry': industry,
+                                                            'name': name,
+                                                            'sector': sector,
+                                                            'country': 'United States',
                                                             'is_currency':False,
                                                             'ipo_year': datetime.strptime(date[:10], "%Y-%m-%d") })
         tickers.append(ticker[:-1])
@@ -39,8 +46,9 @@ def save_sp500_tickers():
 
 def compile_data_to_columns(date=datetime.today()):
     tickers = save_sp500_tickers()
+    end = datetime.today()
     for ticker in enumerate(tickers['Ticker']):
-        df = getPortfolio_ml(ticker, datetime(2020, 10, 21))
+        df = getPortfolio_ml(ticker, date)
         df.rename(columns = {'adjusted_close': ticker}, inplace=True)
         if main_df.empty:
             main_df = df

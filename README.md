@@ -51,6 +51,7 @@ Docker command:
 9. Utilize Blob with file check instead of pickle or base64 database store
 8. Save Model using [Mongo DB](https://django-mongodb-engine.readthedocs.io/en/latest/tutorial.html)
 7. Social Auth User Profile [Management](https://realpython.com/django-user-management/#create-a-dashboard-view)
+10. Add [Budgeting](https://medium.com/@kristian.roopnarine/creating-a-budget-web-app-with-django-655369b6d43c)
 
 
 ## License

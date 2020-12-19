@@ -205,8 +205,8 @@ def ticker_overview(stock_ticker_symbol, date=dt.date.today()):
         img.close()
         StockTickerHistory.objects.update_or_create(symbol_id=stock_ticker_symbol, updated_on=date,
                                                     defaults={'sma_fifty_day': stocks['SMA50'][-1],
-                                                              'green_dot_dates': greenDotDate,
-                                                              'green_dot_values': greenDot,
+                                                              'green_dot_dates': greenDotDate[-5:],
+                                                              'green_dot_values': greenDot[-5:],
                                                               'plot': plot_url })
         return plot_url
     except Exception as ex:

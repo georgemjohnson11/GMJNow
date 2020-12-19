@@ -2,14 +2,14 @@
 {% block title %}Home{% endblock %}
 {% block content %}
     <div class="jumbotron jumbotron-fluid">
-        <h2>Stock Ticker: {{ stock_ticker.name }} ({{ stock_ticker.id }})</h2>
+        <h2>Stock: {{ stock_ticker.name|default_if_none:"N/A" }} ({{ stock_ticker.id }})</h2>
         <div class="container row">
-        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Active: {{ stock_ticker.active }}</div>
-        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Country: {{ stock_ticker.country }}</div>
-        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Market: {{ stock_ticker.exchange_market }}</div>
-        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">IPO Year: {{ stock_ticker.ipo_year }}</div>
-        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Last Sale: {{ stock_ticker.last_sale }}</div>
-        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Industry: {{ stock_ticker.industry }}</div>
+        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Active: {{ stock_ticker.active|default_if_none:"False" }}</div>
+        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Country: {{ stock_ticker.country|default_if_none:"N/A" }}</div>
+        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Market: {{ stock_ticker.exchange_market|default_if_none:"N/A" }}</div>
+        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">IPO Year: {{ stock_ticker.ipo_year|default_if_none:"N/A" }}</div>
+        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Last Sale: {{ stock_ticker.last_sale|default_if_none:"N/A" }}</div>
+        <div class="my-2 my-sm-0 col col-sm-4 col-md-4 col-lg-4">Industry: {{ stock_ticker.industry|default_if_none:"N/A" }}</div>
       </div>
         <container>
             <img class="img-fluid" src="data:image/png;base64,{{ view_portfolio_plot }}"/>

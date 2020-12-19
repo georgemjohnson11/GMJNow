@@ -29,14 +29,16 @@ def getPortfolio(stock_ticker_symbol, date=datetime.today()):
                            .filter(symbol_id = stock_ticker_symbol)
                            .filter(updated_on__range=[datetime(2018,7,25), date])
                            .annotate(updated_date=TruncDate('updated_on'))
-                           .values('updated_date', 'adjusted_close'))).set_index('updated_date')
+                           .values('updated_date', 'adjusted_close')
+                           .order_by("updated_date") )).set_index('updated_date')
     return df
 
 def getPortfolioAdvanced(stock_ticker_symbol, date=datetime.today()):
     df = pd.DataFrame(list(StockTickerHistory.objects
                            .filter(symbol_id = stock_ticker_symbol)
                            .filter(updated_on__range=[datetime(2018,7,25),date])
-                           .values('updated_on', 'high', 'low', 'open', 'volume', 'adjusted_close'))).set_index('updated_on')
+                           .values('updated_on', 'high', 'low', 'open', 'volume', 'adjusted_close')
+                           .order_by("updated_on"))).set_index('updated_on')
     return df
 
 def getPortfolio_ml(stock_ticker_symbol, date=datetime.today()):
@@ -44,7 +46,8 @@ def getPortfolio_ml(stock_ticker_symbol, date=datetime.today()):
                            .filter(symbol_id = stock_ticker_symbol)
                            .filter(updated_on__lte=date)
                            .annotate(updated_date=TruncDate('updated_on'))
-                           .values('updated_date', 'adjusted_close')))
+                           .values('updated_date', 'adjusted_close')
+                           .order_by("updated_date")))
     if 'updated_date' in df.columns:
         df.set_index('updated_date')
     return df
@@ -53,7 +56,8 @@ def getPortfolioDateTime(stock_ticker_symbol, date=datetime.today()):
     df = pd.DataFrame(list(StockTickerHistory.objects
                            .filter(symbol_id = stock_ticker_symbol)
                            .filter(updated_on__lte=date)
-                           .values('updated_on', 'adjusted_close')))
+                           .values('updated_on', 'adjusted_close')
+                           .order_by("updated_on")))
     if 'updated_on' in df.columns:
         df['updated_on'] = pd.to_datetime(df['updated_on'])
         df.set_index('updated_on', inplace=True)
