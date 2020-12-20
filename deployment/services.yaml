@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: gmjnow-service
+spec:
+  type: ClusterIP
+  selector:
+    app: gmjnow-container
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  type: NodePort

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: production
+  labels:
+    app: production
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gmjnow
+  template:
+    metadata:
+      labels:
+        app: gmjnow
+    spec:
+      containers:
+        - name: gmjnow
+          ports:
+            - containerPort: 8000
+              name: gmjnow-gunicron
+      imagePullSecrets:
+        - name: gmjnow-secrets

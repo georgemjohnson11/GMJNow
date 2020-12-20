@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gmjnow-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+spec:
+  tls:
+  - hosts:
+    - gmjnow.com
+    secretName: gmjnow-tls
+  rules:
+  - host: gmjnow.com
+    http:
+      paths:
+      - backend:
+          serviceName: gmjnow
+          servicePort: 8000
